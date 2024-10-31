@@ -43,7 +43,7 @@ func handleSetSinkMuted(msg *json.Message, res *json.Response) {
 			log.Printf("%s sinkInfo['name'].(string) NOT OK\n", errPrefix)
 		}
 
-		muted, ok := sinkInfo["muted"].(string)
+		muted, ok := sinkInfo["muted"].(bool)
 		if !ok {
 			log.Printf("%s sinkInfo['muted'].(bool) NOT OK\n", errPrefix)
 		}
@@ -51,7 +51,6 @@ func handleSetSinkMuted(msg *json.Message, res *json.Response) {
 		pactl.SetSinkMuted(name, muted)
 
 		res.Payload = pactl.GetStatus()
-
 	} else {
 		res.Error = "Invalid sink information format"
 		res.Status = json.StatusActionError
@@ -85,17 +84,17 @@ func handleSetSinkInputMuted(msg *json.Message, res *json.Response) {
 	errPrefix := "ERROR [handleSetSinkInputMuted()]:"
 
 	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
-		name, ok := sinkInputInfo["id"].(string)
+		id, ok := sinkInputInfo["id"].(float64)
 		if !ok {
-			log.Printf("%s sinkInfo['id'].(string) NOT OK\n", errPrefix)
+			log.Printf("%s sinkInfo['id'].(float64) NOT OK\n", errPrefix)
 		}
 
-		muted, ok := sinkInputInfo["muted"].(string)
+		muted, ok := sinkInputInfo["muted"].(bool)
 		if !ok {
 			log.Printf("%s sinkInfo['muted'].(bool) NOT OK\n", errPrefix)
 		}
 
-		pactl.SetSinkMuted(name, muted)
+		pactl.SetSinkInputMuted(fmt.Sprintf("%.0f", id), muted)
 
 		res.Payload = pactl.GetStatus()
 	} else {
