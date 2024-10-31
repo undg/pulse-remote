@@ -91,68 +91,67 @@ func SetSinkInputMuted(sinkInputID string, muted bool) {
 }
 
 func parseOutput(output string) Output {
-    idRe,_ := regexp.Compile(`Sink #(\d+)`)
-    nameRe,_ := regexp.Compile(`Name: (.+)`)
-    descRe,_ := regexp.Compile(`Description: (.+)`)
-    volumeRe,_ := regexp.Compile(`Volume: .+?(\d+)%`)
-    muteRe,_ := regexp.Compile(`Mute: (yes|no)`)
+	idRe, _ := regexp.Compile(`Sink #(\d+)`)
+	nameRe, _ := regexp.Compile(`Name: (.+)`)
+	descRe, _ := regexp.Compile(`Description: (.+)`)
+	volumeRe, _ := regexp.Compile(`Volume: .+?(\d+)%`)
+	muteRe, _ := regexp.Compile(`Mute: (yes|no)`)
 
-    id, _ := strconv.Atoi(idRe.FindStringSubmatch(output)[1])
-    name := nameRe.FindStringSubmatch(output)[1]
-    desc := descRe.FindStringSubmatch(output)[1]
-    volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
-    mute := muteRe.FindStringSubmatch(output)[1] == "yes"
+	id, _ := strconv.Atoi(idRe.FindStringSubmatch(output)[1])
+	name := nameRe.FindStringSubmatch(output)[1]
+	desc := descRe.FindStringSubmatch(output)[1]
+	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
+	mute := muteRe.FindStringSubmatch(output)[1] == "yes"
 
-    return Output{
-        ID:     id,
-        Name:   name,
-        Label:  desc,
-        Volume: volume,
-        Muted:  mute,
-    }
+	return Output{
+		ID:     id,
+		Name:   name,
+		Label:  desc,
+		Volume: volume,
+		Muted:  mute,
+	}
 }
 
 func GetOutputs() ([]Output, error) {
-    cmd := exec.Command("pactl", "list", "sinks")
-    out, err := cmd.Output()
-    if err != nil {
-        return nil, err
-    }
+	cmd := exec.Command("pactl", "list", "sinks")
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
 
-    sinks := strings.Split(string(out), "Sink #")
-    outputs := make([]Output, 0, len(sinks)-1)
+	sinks := strings.Split(string(out), "Sink #")
+	outputs := make([]Output, 0, len(sinks)-1)
 
-    for _, sink := range sinks[1:] {
-        outputs = append(outputs, parseOutput("Sink #"+sink))
-    }
+	for _, sink := range sinks[1:] {
+		outputs = append(outputs, parseOutput("Sink #"+sink))
+	}
 
-    return outputs, nil
+	return outputs, nil
 }
 
 func GetApps() []App {
-    cmd := exec.Command("pactl", "list", "sink-inputs")
-    out, _ := cmd.Output()
+	cmd := exec.Command("pactl", "list", "sink-inputs")
+	out, _ := cmd.Output()
 
-    re, _ := regexp.Compile(`Sink Input #(\d+)[\s\S]*?Sink: (\d+)[\s\S]*?Mute: (yes|no)[\s\S]*?Volume:.*?(\d+)%[\s\S]*?application\.name = "(.*?)"`)
-    matches := re.FindAllStringSubmatch(string(out), -1)
+	re, _ := regexp.Compile(`Sink Input #(\d+)[\s\S]*?Sink: (\d+)[\s\S]*?Mute: (yes|no)[\s\S]*?Volume:.*?(\d+)%[\s\S]*?application\.name = "(.*?)"`)
+	matches := re.FindAllStringSubmatch(string(out), -1)
 
-    apps := make([]App, len(matches))
-    for i, m := range matches {
-        id, _ := strconv.Atoi(m[1])
-        outputID, _ := strconv.Atoi(m[2])
-        volume, _ := strconv.Atoi(m[4])
-        apps[i] = App{
-            ID:       id,
-            OutputID: outputID,
-            Label:    m[5],
-            Volume:   volume,
-            Muted:    m[3] == "yes",
-        }
-    }
+	apps := make([]App, len(matches))
+	for i, m := range matches {
+		id, _ := strconv.Atoi(m[1])
+		outputID, _ := strconv.Atoi(m[2])
+		volume, _ := strconv.Atoi(m[4])
+		apps[i] = App{
+			ID:       id,
+			OutputID: outputID,
+			Label:    m[5],
+			Volume:   volume,
+			Muted:    m[3] == "yes",
+		}
+	}
 
-    return apps
+	return apps
 }
-
 
 func ListenForChanges(callback func()) {
 	cmd := exec.Command("pactl", "subscribe")
