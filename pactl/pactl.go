@@ -5,12 +5,11 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
+	"regexp"
 	"strconv"
 	"strings"
 
-	"github.com/goccy/go-json"
 	"github.com/undg/go-prapi/buildinfo"
-	gen "github.com/undg/go-prapi/pactl/generated"
 )
 
 type Status = struct {
@@ -47,8 +46,13 @@ func SetSinkVolume(sinkName string, volume string) {
 	}
 }
 
-func SetSinkMuted(sinkName string, mutedCmd string) {
+func SetSinkMuted(sinkName string, muted bool) {
 	errPrefix := "ERROR [SetSinkMuted()]"
+
+	mutedCmd := "false"
+	if muted {
+		mutedCmd = "true"
+	}
 
 	cmd := exec.Command("pactl", "set-sink-mute", sinkName, mutedCmd)
 	_, err := cmd.Output()
@@ -70,10 +74,15 @@ func SetSinkInputVolume(sinkInputID string, volume string) {
 	}
 }
 
-func SetSinkInputMuted(sinkInputID string, mutedCmd string) {
+func SetSinkInputMuted(sinkInputID string, muted bool) {
 	errPrefix := "ERROR [SetSinkInputMuted()]"
 
-	cmd := exec.Command("pactl", "set-sink-mute", sinkInputID, mutedCmd)
+	mutedCmd := "false"
+	if muted {
+		mutedCmd = "true"
+	}
+
+	cmd := exec.Command("pactl", "set-sink-input-mute", sinkInputID, mutedCmd)
 	_, err := cmd.Output()
 	if err != nil {
 		log.Printf("%s pactl set-sink-mute: %s\n", errPrefix, err)
@@ -81,91 +90,64 @@ func SetSinkInputMuted(sinkInputID string, mutedCmd string) {
 	}
 }
 
-func adaptOutputs(p gen.PactlSinkJSON) Output {
-	errPrefix := "ERROR [adaptOutputs()]"
+func parseOutput(output string) Output {
+	idRe, _ := regexp.Compile(`Sink #(\d+)`)
+	nameRe, _ := regexp.Compile(`Name: (.+)`)
+	descRe, _ := regexp.Compile(`Description: (.+)`)
+	volumeRe, _ := regexp.Compile(`Volume: .+?(\d+)%`)
+	muteRe, _ := regexp.Compile(`Mute: (yes|no)`)
 
-	frontLeft, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
-	if err != nil {
-		log.Printf("%s parse FRONT_LEFT to int: %s\n", errPrefix, err)
-	}
-
-	frontRight, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
-	if err != nil {
-		log.Printf("%s parse FRONT_RIGHT to int: %s\n", errPrefix, err)
-	}
+	id, _ := strconv.Atoi(idRe.FindStringSubmatch(output)[1])
+	name := nameRe.FindStringSubmatch(output)[1]
+	desc := descRe.FindStringSubmatch(output)[1]
+	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
+	mute := muteRe.FindStringSubmatch(output)[1] == "yes"
 
 	return Output{
-		ID:     int(p.Index),
-		Name:   p.Name,
-		Label:  p.Description,
-		Volume: (frontLeft + frontRight) / 2,
-		Muted:  p.Mute,
+		ID:     id,
+		Name:   name,
+		Label:  desc,
+		Volume: volume,
+		Muted:  mute,
 	}
 }
 
 func GetOutputs() ([]Output, error) {
-	errPrefix := "ERROR [GetOutputs()]"
-
-	cmd := exec.Command("pactl", "--format=json", "list", "sinks")
-	cmdOutput, err := cmd.Output()
+	cmd := exec.Command("pactl", "list", "sinks")
+	out, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	var pactlSinks []gen.PactlSinkJSON
-	err = json.Unmarshal(cmdOutput, &pactlSinks)
-	if err != nil {
-		log.Printf("%s json.Unmarshal: %s\n", errPrefix, err)
+	sinks := strings.Split(string(out), "Sink #")
+	outputs := make([]Output, 0, len(sinks)-1)
+
+	for _, sink := range sinks[1:] {
+		outputs = append(outputs, parseOutput("Sink #"+sink))
 	}
 
-	sinks := make([]Output, len(pactlSinks))
-	for i, ps := range pactlSinks {
-		sinks[i] = adaptOutputs(ps)
-	}
-
-	return sinks, nil
-}
-
-func adaptApps(p gen.PactlAppsJSON) App {
-	errPrefix := "ERROR [adaptApps()]"
-
-	frontLeft, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
-	if err != nil {
-		log.Printf("%s parse FRONT_LEFT to INT: %s\n", errPrefix, err)
-	}
-
-	frontRight, err := strconv.Atoi(strings.Trim(p.Volume.FrontLeft.ValuePercent, "%"))
-	if err != nil {
-		log.Printf("%s parse FRONT_RIGHT to INT: %s\n", errPrefix, err)
-	}
-
-	return App{
-		ID:       int(p.Index),
-		OutputID: int(p.Sink),
-		Label:    p.Properties.Application_Name,
-		Volume:   (frontLeft + frontRight) / 2,
-		Muted:    p.Mute,
-	}
+	return outputs, nil
 }
 
 func GetApps() []App {
-	errPrefix := "ERROR [pactl.GetApps()]"
+	cmd := exec.Command("pactl", "list", "sink-inputs")
+	out, _ := cmd.Output()
 
-	cmd := exec.Command("pactl", "--format=json", "list", "sink-inputs")
-	cmdOutput, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s cmd.Output(): %s", errPrefix, err)
-	}
+	re, _ := regexp.Compile(`Sink Input #(\d+)[\s\S]*?Sink: (\d+)[\s\S]*?Mute: (yes|no)[\s\S]*?Volume:.*?(\d+)%[\s\S]*?application\.name = "(.*?)"`)
+	matches := re.FindAllStringSubmatch(string(out), -1)
 
-	var pactlApps []gen.PactlAppsJSON
-	err = json.Unmarshal(cmdOutput, &pactlApps)
-	if err != nil {
-		log.Printf("%s json.Unmarshal(): %s", errPrefix, err)
-	}
-
-	apps := make([]App, len(pactlApps))
-	for i, ps := range pactlApps {
-		apps[i] = adaptApps(ps)
+	apps := make([]App, len(matches))
+	for i, m := range matches {
+		id, _ := strconv.Atoi(m[1])
+		outputID, _ := strconv.Atoi(m[2])
+		volume, _ := strconv.Atoi(m[4])
+		apps[i] = App{
+			ID:       id,
+			OutputID: outputID,
+			Label:    m[5],
+			Volume:   volume,
+			Muted:    m[3] == "yes",
+		}
 	}
 
 	return apps
