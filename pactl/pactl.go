@@ -81,11 +81,11 @@ func SetSinkInputMuted(sinkInputID string, mutedCmd string) {
 }
 
 func parseOutput(output string) Output {
-    idRe := regexp.MustCompile(`Sink #(\d+)`)
-    nameRe := regexp.MustCompile(`Name: (.+)`)
-    descRe := regexp.MustCompile(`Description: (.+)`)
-    volumeRe := regexp.MustCompile(`Volume: .+?(\d+)%`)
-    muteRe := regexp.MustCompile(`Mute: (yes|no)`)
+    idRe,_ := regexp.Compile(`Sink #(\d+)`)
+    nameRe,_ := regexp.Compile(`Name: (.+)`)
+    descRe,_ := regexp.Compile(`Description: (.+)`)
+    volumeRe,_ := regexp.Compile(`Volume: .+?(\d+)%`)
+    muteRe,_ := regexp.Compile(`Mute: (yes|no)`)
 
     id, _ := strconv.Atoi(idRe.FindStringSubmatch(output)[1])
     name := nameRe.FindStringSubmatch(output)[1]
@@ -123,7 +123,7 @@ func GetApps() []App {
     cmd := exec.Command("pactl", "list", "sink-inputs")
     out, _ := cmd.Output()
 
-    re := regexp.MustCompile(`Sink Input #(\d+)[\s\S]*?Sink: (\d+)[\s\S]*?Mute: (yes|no)[\s\S]*?Volume:.*?(\d+)%[\s\S]*?application\.name = "(.*?)"`)
+    re, _ := regexp.Compile(`Sink Input #(\d+)[\s\S]*?Sink: (\d+)[\s\S]*?Mute: (yes|no)[\s\S]*?Volume:.*?(\d+)%[\s\S]*?application\.name = "(.*?)"`)
     matches := re.FindAllStringSubmatch(string(out), -1)
 
     apps := make([]App, len(matches))
