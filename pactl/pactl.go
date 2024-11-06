@@ -153,6 +153,46 @@ func GetApps() []App {
 	return apps
 }
 
+func parseSources(output string) Output {
+	idRe, _ := regexp.Compile(`Source #(\d+)`)
+	nameRe, _ := regexp.Compile(`Name: (.+)`)
+	descRe, _ := regexp.Compile(`Description: (.+)`)
+	volumeRe, _ := regexp.Compile(`Volume: .+?(\d+)%`)
+	muteRe, _ := regexp.Compile(`Mute: (yes|no)`)
+
+	id, _ := strconv.Atoi(idRe.FindStringSubmatch(output)[1])
+	name := nameRe.FindStringSubmatch(output)[1]
+	desc := descRe.FindStringSubmatch(output)[1]
+	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
+	mute := muteRe.FindStringSubmatch(output)[1] == "yes"
+
+	return Output{
+		ID:     id,
+		Name:   name,
+		Label:  desc,
+		Volume: volume,
+		Muted:  mute,
+	}
+}
+
+func GetSources() ([]Output, error) {
+	cmd := exec.Command("pactl", "list", "sources")
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
+
+	source := strings.Split(string(out), "Source #")
+	outputs := make([]Output, 0, len(source)-1)
+
+	for _, sink := range source[1:] {
+		outputs = append(outputs, parseSources("Source #"+sink))
+	}
+
+	return outputs, nil
+}
+
+
 func ListenForChanges(callback func()) {
 	cmd := exec.Command("pactl", "subscribe")
 	stdout, _ := cmd.StdoutPipe()
