@@ -127,6 +127,10 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			status, _ := pactl.GetOutputs()
 			res.Payload = status
 
+		case json.ActionGetSources:
+			status, _ := pactl.GetSources()
+			res.Payload = status
+
 		case json.ActionGetSchema:
 			handleGetSchema(&res)
 

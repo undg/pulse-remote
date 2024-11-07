@@ -63,3 +63,33 @@ func TestGetOutputs(t *testing.T) {
 		})
 	}
 }
+
+func TestGetSources(t *testing.T) {
+	t.Run("Volume", func(t *testing.T) {
+		source, _ := GetSources()
+		if source[0].Volume < 0 {
+			t.Errorf("Expected volume more than 0, but got %d", source[0].Volume)
+		}
+	})
+	namePattern := `^(alsa_output|bluez_sink|bluez_output|combined)\..*`
+	re := regexp.MustCompile(namePattern)
+
+	tests := []struct {
+		Name  string
+		Input string
+		Want  bool
+	}{
+		{"ValidSink", "alsa_output.pci-0000_0c_00.4.analog-stereo", true},
+		{"InvalidSink", "dupa", false},
+		{"InvalidEmptySink", "", false},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.Name, func(t *testing.T) {
+			sink, _ := GetOutputs()
+			if got := re.MatchString(tt.Input); got != tt.Want {
+				t.Errorf("Expected name should starts with pattern, but got [%s]", sink[0].Name)
+			}
+		})
+	}
+}
