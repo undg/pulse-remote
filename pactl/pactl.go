@@ -35,7 +35,6 @@ type Source struct {
 	Muted  bool   `json:"muted" doc:"Whether the source is muted"`
 }
 
-
 type App struct {
 	ID       int    `json:"id" doc:"The id of the sink. Same  as name"`
 	OutputID int    `json:"outputId" doc:"Id of parrent device, same as output.id"`
@@ -202,7 +201,6 @@ func GetSources() ([]Source, error) {
 	return sources, nil
 }
 
-
 func ListenForChanges(callback func()) {
 	cmd := exec.Command("pactl", "subscribe")
 	stdout, _ := cmd.StdoutPipe()
@@ -229,7 +227,6 @@ func GetStatus() Status {
 	if err != nil {
 		log.Printf("%s GetSources(): %s", errPrefix, err)
 	}
-
 
 	apps := GetApps()
 

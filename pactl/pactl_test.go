@@ -93,4 +93,3 @@ func TestGetSources(t *testing.T) {
 		})
 	}
 }
-
