@@ -15,6 +15,7 @@ import (
 type Status = struct {
 	Outputs   []Output            `json:"outputs" doc:"List of output devices"`
 	Apps      []App               `json:"apps" doc:"List of applications"`
+	Sources   []Source            `json:"sources" doc:"List of microphones and other sources"`
 	BuildInfo buildinfo.BuildInfo `json:"buildInfo" doc:"Build information"`
 }
 
@@ -25,6 +26,15 @@ type Output struct {
 	Volume int    `json:"volume" doc:"Current volume level of the sink"`
 	Muted  bool   `json:"muted" doc:"Whether the sink is muted"`
 }
+
+type Source struct {
+	ID     int    `json:"id" doc:"The id of the source. Same  as name"`
+	Name   string `json:"name" doc:"The name of the source. Same as id"`
+	Label  string `json:"label" doc:"Human-readable label for the source"`
+	Volume int    `json:"volume" doc:"Current volume level of the source"`
+	Muted  bool   `json:"muted" doc:"Whether the source is muted"`
+}
+
 
 type App struct {
 	ID       int    `json:"id" doc:"The id of the sink. Same  as name"`
@@ -153,7 +163,7 @@ func GetApps() []App {
 	return apps
 }
 
-func parseSources(output string) Output {
+func parseSources(output string) Source {
 	idRe, _ := regexp.Compile(`Source #(\d+)`)
 	nameRe, _ := regexp.Compile(`Name: (.+)`)
 	descRe, _ := regexp.Compile(`Description: (.+)`)
@@ -166,7 +176,7 @@ func parseSources(output string) Output {
 	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
 	mute := muteRe.FindStringSubmatch(output)[1] == "yes"
 
-	return Output{
+	return Source{
 		ID:     id,
 		Name:   name,
 		Label:  desc,
@@ -175,7 +185,7 @@ func parseSources(output string) Output {
 	}
 }
 
-func GetSources() ([]Output, error) {
+func GetSources() ([]Source, error) {
 	cmd := exec.Command("pactl", "list", "sources")
 	out, err := cmd.Output()
 	if err != nil {
@@ -183,13 +193,13 @@ func GetSources() ([]Output, error) {
 	}
 
 	source := strings.Split(string(out), "Source #")
-	outputs := make([]Output, 0, len(source)-1)
+	sources := make([]Source, 0, len(source)-1)
 
 	for _, sink := range source[1:] {
-		outputs = append(outputs, parseSources("Source #"+sink))
+		sources = append(sources, parseSources("Source #"+sink))
 	}
 
-	return outputs, nil
+	return sources, nil
 }
 
 
@@ -215,6 +225,12 @@ func GetStatus() Status {
 		log.Printf("%s GetOutputs(): %s", errPrefix, err)
 	}
 
+	sources, err := GetSources()
+	if err != nil {
+		log.Printf("%s GetSources(): %s", errPrefix, err)
+	}
+
+
 	apps := GetApps()
 
 	bi := buildinfo.Get()
@@ -222,6 +238,7 @@ func GetStatus() Status {
 	return Status{
 		Outputs:   outputs,
 		Apps:      apps,
+		Sources:   sources,
 		BuildInfo: *bi,
 	}
 }
