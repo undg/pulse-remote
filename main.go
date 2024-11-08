@@ -16,7 +16,7 @@ import (
 func startServer(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
-		case "/api":
+		case "/api/v1/schema/":
 			json.RenderSchemaJSON(w, r)
 		case "/api/v1/ws":
 			ws.HandleWebSocket(w, r)
