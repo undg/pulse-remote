@@ -11,7 +11,7 @@ import (
 	"github.com/undg/go-prapi/pactl"
 )
 
-func RenderSchemaJSON(w http.ResponseWriter, r *http.Request) {
+func ServeStatusSchemaJSON(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	s, err := schema.Generate(reflect.TypeOf(pactl.Status{}))
