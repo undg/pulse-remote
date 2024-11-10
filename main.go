@@ -38,8 +38,6 @@ func startServer(mux *http.ServeMux) {
 			fs.ServeHTTP(w, r)
 		}
 	}))
-
-	mux.Handle("/", fs)
 }
 
 func main() {

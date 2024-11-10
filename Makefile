@@ -107,8 +107,9 @@ build:
 
 ## build: build the application together with frontend
 .PHONY: build/full
-build/full: build/fe
-	build
+build/full:
+	make build/fe
+	make build
 
 ## run: build and run the application
 .PHONY: run
