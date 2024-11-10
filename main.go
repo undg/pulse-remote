@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/undg/go-prapi/buildinfo"
 	"github.com/undg/go-prapi/json"
@@ -30,6 +31,14 @@ func startServer(mux *http.ServeMux) {
 	})
 
 	fs := http.FileServer(http.Dir("/tmp/bin/pr-web/dist"))
+	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if _, err := os.Stat("/tmp/bin/pr-web/dist" + r.URL.Path); os.IsNotExist(err) {
+			http.ServeFile(w, r, "/tmp/bin/pr-web/dist/index.html")
+		} else {
+			fs.ServeHTTP(w, r)
+		}
+	}))
+
 	mux.Handle("/", fs)
 }
 
