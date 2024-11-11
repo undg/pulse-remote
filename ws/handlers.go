@@ -20,12 +20,12 @@ func handleSetSinkVolume(msg *json.Message, res *json.Response) {
 			log.Printf("%s sinkInfo['name'].(string) NOT OK\n", errPrefix)
 		}
 
-		volume, ok := sinkInfo["volume"].(string)
+		volume, ok := sinkInfo["volume"].(float64)
 		if !ok {
-			log.Printf("%s sinkInfo['volume'].(string) NOT OK\n", errPrefix)
+			log.Printf("%s sinkInfo['volume'].(float64) NOT OK\n", errPrefix)
 		}
 
-		pactl.SetSinkVolume(name, volume)
+		pactl.SetSinkVolume(name, fmt.Sprintf("%.2f", volume))
 
 		res.Payload = pactl.GetStatus()
 	} else {
@@ -66,12 +66,12 @@ func handleSetSinkInputVolume(msg *json.Message, res *json.Response) {
 			log.Printf("%s sinkInfo['id'].(float64) NOT OK\n", errPrefix)
 		}
 
-		volume, ok := sinkInputInfo["volume"].(string)
+		volume, ok := sinkInputInfo["volume"].(float64)
 		if !ok {
-			log.Printf("%s sinkInfo['volume'].(string) NOT OK\n", errPrefix)
+			log.Printf("%s sinkInfo['volume'].(float64) NOT OK\n", errPrefix)
 		}
 
-		pactl.SetSinkInputVolume(fmt.Sprintf("%.0f", id), volume)
+		pactl.SetSinkInputVolume(fmt.Sprintf("%.0f", id), fmt.Sprintf("%.2f", volume))
 
 		res.Payload = pactl.GetStatus()
 	} else {
