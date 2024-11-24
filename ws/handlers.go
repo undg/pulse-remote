@@ -107,17 +107,17 @@ func handleMoveSinkInput(msg *json.Message, res *json.Response) {
 	errPrefix := "Error [handleMoveSinkInput()]"
 
 	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
-		sinkInputId, ok := sinkInputInfo["inputId"].(float64)
+		sinkInputID, ok := sinkInputInfo["inputId"].(float64)
 		if !ok {
 			log.Printf("%s sinkInfo['inputId'].(float64) NOT OK\n", errPrefix)
 		}
 
-		sinkId, ok := sinkInputInfo["sinkId"].(string)
+		sinkName, ok := sinkInputInfo["sinkName"].(string)
 		if !ok {
-			log.Printf("%s sinkInfo['sinkId'].(string) NOT OK\n", errPrefix)
+			log.Printf("%s sinkInfo['sinkName'].(string) NOT OK\n", errPrefix)
 		}
 
-		pactl.MoveSinkInput(fmt.Sprintf("%.0f", sinkInputId), sinkId)
+		pactl.MoveSinkInput(fmt.Sprintf("%.0f", sinkInputID), sinkName)
 
 		res.Payload = pactl.GetStatus()
 	} else {
@@ -130,7 +130,7 @@ func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
 	errPrefix := "Error [handleMoveSourceOutput()]"
 
 	if sourceOutputInfo, ok := msg.Payload.(map[string]interface{}); ok {
-		sourceOutputId, ok := sourceOutputInfo["outputId"].(float64)
+		sourceOutputID, ok := sourceOutputInfo["outputId"].(float64)
 		if !ok {
 			log.Printf("%s sourceOutputInfo['outputId'].(float64) NOT OK\n", errPrefix)
 		}
@@ -140,7 +140,7 @@ func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
 			log.Printf("%s sourceOutputInfo['sourceName'].(string) NOT OK\n", errPrefix)
 		}
 
-		pactl.MoveSourceOutput(fmt.Sprintf("%.0f", sourceOutputId), sourceName)
+		pactl.MoveSourceOutput(fmt.Sprintf("%.0f", sourceOutputID), sourceName)
 
 		res.Payload = pactl.GetStatus()
 	} else {
