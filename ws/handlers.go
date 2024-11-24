@@ -103,6 +103,52 @@ func handleSetSinkInputMuted(msg *json.Message, res *json.Response) {
 	}
 }
 
+func handleMoveSinkInput(msg *json.Message, res *json.Response) {
+	errPrefix := "Error [handleMoveSinkInput()]"
+
+	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		sinkInputID, ok := sinkInputInfo["inputId"].(float64)
+		if !ok {
+			log.Printf("%s sinkInfo['inputId'].(float64) NOT OK\n", errPrefix)
+		}
+
+		sinkName, ok := sinkInputInfo["sinkName"].(string)
+		if !ok {
+			log.Printf("%s sinkInfo['sinkName'].(string) NOT OK\n", errPrefix)
+		}
+
+		pactl.MoveSinkInput(fmt.Sprintf("%.0f", sinkInputID), sinkName)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = json.StatusActionError
+	}
+}
+
+func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
+	errPrefix := "Error [handleMoveSourceOutput()]"
+
+	if sourceOutputInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		sourceOutputID, ok := sourceOutputInfo["outputId"].(float64)
+		if !ok {
+			log.Printf("%s sourceOutputInfo['outputId'].(float64) NOT OK\n", errPrefix)
+		}
+
+		sourceName, ok := sourceOutputInfo["sourceName"].(string)
+		if !ok {
+			log.Printf("%s sourceOutputInfo['sourceName'].(string) NOT OK\n", errPrefix)
+		}
+
+		pactl.MoveSourceOutput(fmt.Sprintf("%.0f", sourceOutputID), sourceName)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid source information format"
+		res.Status = json.StatusActionError
+	}
+}
+
 func handleGetCards(res *json.Response) {
 	errPrefix := "ERROR [handleGetCards()]"
 	debugPrefix := "DEBUG [handleGetCards()]"

@@ -119,6 +119,12 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		case json.ActionSetSinkInputMuted:
 			handleSetSinkInputMuted(&msg, &res)
 
+		case json.ActionMoveSinkInput:
+			handleMoveSinkInput(&msg, &res)
+
+		case json.ActionMoveSourceOutput:
+			handleMoveSourceOutput(&msg, &res)
+
 		case json.ActionGetCards:
 			handleGetCards(&res)
 			handleGetOutputs(&res)

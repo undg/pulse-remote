@@ -99,6 +99,28 @@ func SetSinkInputMuted(sinkInputID string, muted bool) {
 	}
 }
 
+func MoveSinkInput(sinkInputID string, sinkName string) {
+	errPrefix := "Error [MoveSinkInput()]"
+
+	cmd := exec.Command("pactl", "move-sink-input", sinkInputID, sinkName)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Printf("%s pactl move-sink-input: %s\n", errPrefix, err)
+		log.Printf("%s pactl move-sink-input: {SINK_INPUT_ID: %s ; SINK_NAME: %s}\n", errPrefix, sinkInputID, sinkName)
+	}
+}
+
+func MoveSourceOutput(sourceOutputID string, sourceName string) {
+	errPrefix := "Error [MoveSourceOutput()]"
+
+	cmd := exec.Command("pactl", "move-source-output", sourceOutputID, sourceName)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Printf("%s pactl move-source-output: %s\n", errPrefix, err)
+		log.Printf("%s pactl move-source-output: {SOURCE_OUTPUT_ID: %s ; SOURCE_NAME: %s}\n", errPrefix, sourceOutputID, sourceName)
+	}
+}
+
 func parseOutput(output string) Output {
 	idRe, _ := regexp.Compile(`Sink #(\d+)`)
 	nameRe, _ := regexp.Compile(`Name: (.+)`)
