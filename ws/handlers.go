@@ -103,6 +103,29 @@ func handleSetSinkInputMuted(msg *json.Message, res *json.Response) {
 	}
 }
 
+func handleMoveSinkInput(msg *json.Message, res *json.Response) {
+	errPrefix := "Error [handleMoveSinkInput()]"
+
+	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		sinkInputId, ok := sinkInputInfo["inputId"].(float64)
+		if !ok {
+			log.Printf("%s sinkInfo['id'].(float64) NOT OK\n", errPrefix)
+		}
+
+		sinkId, ok := sinkInputInfo["sinkId"].(string)
+		if !ok {
+			log.Printf("%s sinkInfo['sinkId'].(string) NOT OK\n", errPrefix)
+		}
+
+		pactl.MoveSinkInput(fmt.Sprintf("%.0f", sinkInputId), sinkId)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = json.StatusActionError
+	}
+}
+
 func handleGetCards(res *json.Response) {
 	errPrefix := "ERROR [handleGetCards()]"
 	debugPrefix := "DEBUG [handleGetCards()]"

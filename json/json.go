@@ -19,6 +19,9 @@ const (
 	ActionSetSinkInputVolume Action = "SetSinkInputVolume"
 	ActionSetSinkInputMuted  Action = "SetSinkInputMuted"
 
+	ActionMoveSinkInput Action = "MoveSinkInput"
+
+	// Not used for now
 	ActionGetSinks   Action = "GetSinks"
 	ActionGetCards   Action = "GetCards"
 	ActionGetOutputs Action = "GetOutputs"
@@ -29,11 +32,16 @@ const (
 var AvailableCommands = []Action{
 	ActionGetStatus,
 	ActionGetBuildInfo,
+
 	ActionSetSinkVolume,
 	ActionSetSinkMuted,
+
 	ActionSetSinkInputVolume,
 	ActionSetSinkInputMuted,
 
+	ActionMoveSinkInput,
+
+	// Not used for now
 	ActionGetSinks,
 	ActionGetCards,
 	ActionGetOutputs,
