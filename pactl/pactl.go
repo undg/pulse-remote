@@ -110,6 +110,17 @@ func MoveSinkInput(sinkInputID string, sinkName string) {
 	}
 }
 
+func MoveSourceOutput(sourceOutputID string, sourceName string) {
+	errPrefix := "Error [MoveSourceOutput()]"
+
+	cmd := exec.Command("pactl", "move-source-output", sourceOutputID, sourceName)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Printf("%s pactl move-source-output: %s\n", errPrefix, err)
+		log.Printf("%s pactl move-source-output: {SOURCE_OUTPUT_ID: %s ; SOURCE_NAME: %s}\n", errPrefix, sourceOutputID, sourceName)
+	}
+}
+
 func parseOutput(output string) Output {
 	idRe, _ := regexp.Compile(`Sink #(\d+)`)
 	nameRe, _ := regexp.Compile(`Name: (.+)`)

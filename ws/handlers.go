@@ -109,7 +109,7 @@ func handleMoveSinkInput(msg *json.Message, res *json.Response) {
 	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
 		sinkInputId, ok := sinkInputInfo["inputId"].(float64)
 		if !ok {
-			log.Printf("%s sinkInfo['id'].(float64) NOT OK\n", errPrefix)
+			log.Printf("%s sinkInfo['inputId'].(float64) NOT OK\n", errPrefix)
 		}
 
 		sinkId, ok := sinkInputInfo["sinkId"].(string)
@@ -122,6 +122,29 @@ func handleMoveSinkInput(msg *json.Message, res *json.Response) {
 		res.Payload = pactl.GetStatus()
 	} else {
 		res.Error = "Invalid sink information format"
+		res.Status = json.StatusActionError
+	}
+}
+
+func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
+	errPrefix := "Error [handleMoveSourceOutput()]"
+
+	if sourceOutputInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		sourceOutputId, ok := sourceOutputInfo["outputId"].(float64)
+		if !ok {
+			log.Printf("%s sourceOutputInfo['outputId'].(float64) NOT OK\n", errPrefix)
+		}
+
+		sourceName, ok := sourceOutputInfo["sourceName"].(string)
+		if !ok {
+			log.Printf("%s sourceOutputInfo['sourceName'].(string) NOT OK\n", errPrefix)
+		}
+
+		pactl.MoveSourceOutput(fmt.Sprintf("%.0f", sourceOutputId), sourceName)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid source information format"
 		res.Status = json.StatusActionError
 	}
 }

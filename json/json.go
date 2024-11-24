@@ -20,6 +20,7 @@ const (
 	ActionSetSinkInputMuted  Action = "SetSinkInputMuted"
 
 	ActionMoveSinkInput Action = "MoveSinkInput"
+	ActionMoveSourceOutput Action = "MoveSourceOutput"
 
 	// Not used for now
 	ActionGetSinks   Action = "GetSinks"
