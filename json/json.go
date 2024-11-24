@@ -19,7 +19,7 @@ const (
 	ActionSetSinkInputVolume Action = "SetSinkInputVolume"
 	ActionSetSinkInputMuted  Action = "SetSinkInputMuted"
 
-	ActionMoveSinkInput Action = "MoveSinkInput"
+	ActionMoveSinkInput    Action = "MoveSinkInput"
 	ActionMoveSourceOutput Action = "MoveSourceOutput"
 
 	// Not used for now
