@@ -63,7 +63,7 @@ func main() {
 
 	startServer(mux)
 
-	// @TODO (undg) 2024-10-10: do not braodcast to client that send outgoing update
+	// @TODO (undg) 2024-10-10: do not broadcast to client that send outgoing update
 	go ws.BroadcastUpdates()
 
 	err := http.ListenAndServe(utils.PORT, mux)
