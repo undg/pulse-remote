@@ -114,7 +114,7 @@ build/full:
 ## run: build and run the application
 .PHONY: run
 run: build
-	/tmp/bin/${BINARY_NAME}
+	while true; do /tmp/bin/${BINARY_NAME};sleep 1; done
 
 ## run: build/full and run the application
 .PHONY: run/full
