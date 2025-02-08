@@ -21,12 +21,6 @@ const (
 
 	ActionMoveSinkInput    Action = "MoveSinkInput"
 	ActionMoveSourceOutput Action = "MoveSourceOutput"
-
-	// Not used for now
-	ActionGetSinks   Action = "GetSinks"
-	ActionGetOutputs Action = "GetOutputs"
-	ActionGetSources Action = "GetSources"
-	ActionGetSchema  Action = "GetSchema"
 )
 
 var AvailableCommands = []Action{
@@ -40,11 +34,6 @@ var AvailableCommands = []Action{
 	ActionSetSinkInputMuted,
 
 	ActionMoveSinkInput,
-
-	// Not used for now
-	ActionGetSinks,
-	ActionGetSources,
-	ActionGetSchema,
 }
 
 // Message is an request from the client

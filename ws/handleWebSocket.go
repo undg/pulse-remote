@@ -125,17 +125,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		case json.ActionMoveSourceOutput:
 			handleMoveSourceOutput(&msg, &res)
 
-		case json.ActionGetSinks:
-			status, _ := pactl.GetOutputs()
-			res.Payload = status
-
-		case json.ActionGetSources:
-			status, _ := pactl.GetSources()
-			res.Payload = status
-
-		case json.ActionGetSchema:
-			handleGetSchema(&res)
-
 		default:
 			res.Error = "Command not found. Available actions: " + strings.Join(utils.ActionsToStrings(json.AvailableCommands), " ")
 			res.Status = json.StatusActionError
