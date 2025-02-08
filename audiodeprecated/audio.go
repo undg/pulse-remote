@@ -7,25 +7,6 @@ import (
 	"mrogalski.eu/go/pulseaudio"
 )
 
-type Audio struct {
-	Volume float32
-	Mute   bool
-}
-
-type CardInfo struct {
-	Name  string
-	Index uint32
-}
-
-type OutputsInfo struct {
-	ActiveIndex int
-	CardID      string
-	CardName    string
-	PortName    string
-	Available   bool
-	PortID      string
-}
-
 // clientOpen don't forget to closeClient()
 func clientOpen() pulseaudio.Client {
 	client, err := pulseaudio.NewClient()
@@ -38,6 +19,11 @@ func clientOpen() pulseaudio.Client {
 
 func clientClose(c pulseaudio.Client) {
 	defer c.Close()
+}
+
+type CardInfo struct {
+	Name  string
+	Index uint32
 }
 
 func GetCards() ([]CardInfo, error) {
@@ -62,6 +48,15 @@ func GetCards() ([]CardInfo, error) {
 	}
 
 	return cardsInfo, nil
+}
+
+type OutputsInfo struct {
+	ActiveIndex int
+	CardID      string
+	CardName    string
+	PortName    string
+	Available   bool
+	PortID      string
 }
 
 func GetOutputs() ([]OutputsInfo, error) {
