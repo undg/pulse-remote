@@ -26,8 +26,8 @@ type OutputsInfo struct {
 	PortID      string
 }
 
-// ClientOpen don't forget to closeClient()
-func ClientOpen() pulseaudio.Client {
+// clientOpen don't forget to closeClient()
+func clientOpen() pulseaudio.Client {
 	client, err := pulseaudio.NewClient()
 	if err != nil {
 		panic(err)
@@ -36,111 +36,20 @@ func ClientOpen() pulseaudio.Client {
 	return *client
 }
 
-func ClientClose(c pulseaudio.Client) {
+func clientClose(c pulseaudio.Client) {
 	defer c.Close()
 }
 
-func ClientToggleMute(c pulseaudio.Client) bool {
-	mute, err := c.ToggleMute()
-	if err != nil {
-		log.Println("ERROR clientToggleMute c.ToggleMute", err)
-	}
-	return mute
-}
-
-func ClientMute(c pulseaudio.Client) {
-	err := c.SetMute(true)
-	if err != nil {
-		log.Println("ERROR clientMute c.SetMute", err)
-	}
-}
-
-func ClientUnMute(c pulseaudio.Client) {
-	err := c.SetMute(false)
-	if err != nil {
-		log.Println("ERROR clientUnMute c.SetMute", err)
-	}
-}
-
-func ClientMuteStatus(c pulseaudio.Client) bool {
-	mute, err := c.Mute()
-	if err != nil {
-		log.Println("ERROR clientMuteStatus c.Mute", err)
-	}
-	return mute
-}
-
-func ClientVolume(c pulseaudio.Client) float32 {
-	volume, err := c.Volume()
-	if err != nil {
-		log.Println("ERROR clientVolume c.Volume", err)
-	}
-	return volume
-}
-
-func SetVol(vol float32) Audio {
-	c := ClientOpen()
-
-	err := c.SetVolume(vol)
-	if err != nil {
-		log.Println("ERROR setVol c.SetVolume", err)
-	}
-
-	ClientUnMute(c)
-	Volume := ClientVolume(c)
-	Mute := ClientMuteStatus(c)
-
-	ClientClose(c)
-	return Audio{Volume, Mute}
-}
-
-func ToggleMute() Audio {
-	c := ClientOpen()
-
-	Volume := ClientVolume(c)
-	Mute := ClientToggleMute(c)
-
-	ClientClose(c)
-	return Audio{Volume, Mute}
-}
-
-func Mute(isMuted bool) Audio {
-	c := ClientOpen()
-
-	switch {
-	case isMuted:
-		ClientMute(c)
-	case !isMuted:
-		ClientUnMute(c)
-	}
-
-	Volume := ClientVolume(c)
-	Mute := ClientMuteStatus(c)
-
-	ClientClose(c)
-	return Audio{Volume, Mute}
-}
-
-func GetVol() Audio {
-	c := ClientOpen()
-
-	Volume := ClientVolume(c)
-	Mute := ClientMuteStatus(c)
-
-	ClientClose(c)
-	return Audio{Volume, Mute}
-}
-
 func GetCards() ([]CardInfo, error) {
-	c := ClientOpen()
+	c := clientOpen()
 
 	cards, err := c.Cards()
 	if err != nil {
-		log.Println("ERROR clientVolume c.Volume", err)
-		return nil, errors.New("ERROR clientVolume c.Volume")
+		log.Println("ERROR GetCards c.Volume", err)
+		return nil, errors.New("ERROR GetCards c.Volume")
 	}
 
-	ClientClose(c)
+	clientClose(c)
 
 	cardsInfo := []CardInfo{}
 
@@ -156,15 +65,15 @@ func GetCards() ([]CardInfo, error) {
 }
 
 func GetOutputs() ([]OutputsInfo, error) {
-	c := ClientOpen()
+	c := clientOpen()
 
 	output, activeIndex, err := c.Outputs()
 	if err != nil {
-		log.Println("ERROR clientVolume c.Volume", err)
-		return nil, errors.New("ERROR clientVolume c.Volume")
+		log.Println("ERROR GetOutputs c.Volume", err)
+		return nil, errors.New("ERROR GetOutputs c.Volume")
 	}
 
-	ClientClose(c)
+	clientClose(c)
 
 	outputsInfo := []OutputsInfo{}
 	for _, output := range output {
