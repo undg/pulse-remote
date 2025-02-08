@@ -2,50 +2,25 @@ package ws
 
 import (
 	"log"
-	"net"
 	"net/http"
 	"strings"
 	"sync"
 
 	"github.com/gorilla/websocket"
-	"github.com/undg/go-prapi/buildinfo"
 	"github.com/undg/go-prapi/json"
 	"github.com/undg/go-prapi/pactl"
 	"github.com/undg/go-prapi/utils"
 )
 
-var Upgrader = websocket.Upgrader{
-	ReadBufferSize:  1024,
-	WriteBufferSize: 1024,
-}
-
 var clients = make(map[*websocket.Conn]bool)
 var clientsMutex = &sync.Mutex{}
-
-func upgraderCheckOrigin() {
-	Upgrader.CheckOrigin = func(r *http.Request) bool {
-		host, _, err := net.SplitHostPort(r.RemoteAddr)
-		if err != nil {
-			log.Printf("Error splitting host and port: %v\n", err)
-			return false
-		}
-
-		ip := net.ParseIP(host)
-		if ip == nil {
-			log.Printf("Invalid IP: %s\n", host)
-			return false
-		}
-
-		return utils.IsLocalIP(ip) || strings.HasPrefix(r.Host, "localhost")
-	}
-}
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	log.Printf("wsEndpoint visited by: %s %s\n", r.Host, r.RemoteAddr)
 
 	upgraderCheckOrigin()
 
-	conn, err := Upgrader.Upgrade(w, r, nil)
+	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Printf("Error upgrading to WebSocket: %v\n", err)
 		return
@@ -66,7 +41,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		Status:  json.StatusSuccess,
 		Payload: status,
 	}
-	if err := conn.WriteJSON(initialResponse); err != nil {
+
+	if err := safeWriteJson(conn, initialResponse); err != nil {
 		log.Printf("Error sending initial sinks data: %v\n", err)
 	}
 
@@ -103,10 +79,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			status := pactl.GetStatus()
 			res.Payload = status
 
-		case json.ActionGetBuildInfo:
-			b := buildinfo.Get()
-			res.Payload = b
-
 		case json.ActionSetSinkVolume:
 			handleSetSinkVolume(&msg, &res)
 
@@ -132,7 +104,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 		handleServerLog(&msg, &res)
 
-		if err := conn.WriteJSON(res); err != nil {
+		if err := safeWriteJson(conn, res); err != nil {
 			log.Printf("Error writing JSON: %v\n", err)
 			break
 		}

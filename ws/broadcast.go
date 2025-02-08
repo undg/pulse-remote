@@ -31,7 +31,7 @@ func BroadcastUpdates() {
 			continue
 		}
 
-		// Same Action and StatusSuccess if everyting is OK
+		// Same Action and StatusSuccess if everything is OK
 		res := json.Response{
 			Action: string(json.ActionGetStatus),
 			Status: json.StatusSuccess,
@@ -50,7 +50,7 @@ func BroadcastUpdates() {
 		updatedClients := 0
 		for conn := range clients {
 			conn.SetWriteDeadline(time.Now().Add(writeWait))
-			err := conn.WriteJSON(res)
+			err := safeWriteJson(conn, res)
 			if err != nil {
 				log.Printf("Error broadcast VOLUME update to client: %v\n", err)
 				conn.Close()
