@@ -24,7 +24,6 @@ const (
 
 	// Not used for now
 	ActionGetSinks   Action = "GetSinks"
-	ActionGetCards   Action = "GetCards"
 	ActionGetOutputs Action = "GetOutputs"
 	ActionGetSources Action = "GetSources"
 	ActionGetSchema  Action = "GetSchema"
@@ -44,8 +43,6 @@ var AvailableCommands = []Action{
 
 	// Not used for now
 	ActionGetSinks,
-	ActionGetCards,
-	ActionGetOutputs,
 	ActionGetSources,
 	ActionGetSchema,
 }

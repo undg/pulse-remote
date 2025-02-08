@@ -125,10 +125,6 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		case json.ActionMoveSourceOutput:
 			handleMoveSourceOutput(&msg, &res)
 
-		case json.ActionGetCards:
-			handleGetCards(&res)
-			handleGetOutputs(&res)
-
 		case json.ActionGetSinks:
 			status, _ := pactl.GetOutputs()
 			res.Payload = status

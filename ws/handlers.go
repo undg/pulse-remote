@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/undg/go-prapi/audiodeprecated"
 	"github.com/undg/go-prapi/json"
 	"github.com/undg/go-prapi/pactl"
 	"github.com/undg/go-prapi/utils"
@@ -146,58 +145,6 @@ func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
 	} else {
 		res.Error = "Invalid source information format"
 		res.Status = json.StatusActionError
-	}
-}
-
-func handleGetCards(res *json.Response) {
-	errPrefix := "ERROR [handleGetCards()]"
-	debugPrefix := "DEBUG [handleGetCards()]"
-
-	cards, err := audiodeprecated.GetCards()
-	if err != nil {
-		log.Printf("%s audiodeprecated.GetCards(): %s\n", errPrefix, err)
-		res.Error = "ERROR can't get cards information from the system"
-		res.Status = json.StatusError
-	}
-
-	b, err := j.Marshal(cards)
-	if err != nil {
-		log.Printf("%s j.Marshal(cards): %s\n", errPrefix, err)
-		res.Error = "ERROR can't pull cards information"
-		res.Status = json.StatusError
-	}
-
-	res.Payload = string(b)
-	if utils.DEBUG {
-		log.Printf("%s handleGetCards(res).Action: %s\n", debugPrefix, res.Action)
-		log.Printf("%s handleGetCards(res).Payload: %s\n", debugPrefix, res.Payload)
-	}
-}
-
-func handleGetOutputs(res *json.Response) {
-	errPrefix := "ERROR [handleGetOutputs()]"
-	debugPrefix := "DEBUG [handleGetOutputs()]"
-
-	outputs, err := audiodeprecated.GetOutputs()
-	if err != nil {
-		log.Printf("%s audiodeprecated.GetOutputs(): %s\n", errPrefix, err)
-
-		res.Error = "ERROR can't get outputs information from the system"
-		res.Status = json.StatusError
-	}
-
-	b, err := j.Marshal(outputs)
-	if err != nil {
-		log.Printf("%s j.Marshal(): %s\n", errPrefix, err)
-
-		res.Error = "ERROR can't pull outputs information"
-		res.Status = json.StatusError
-	}
-
-	res.Payload = string(b)
-
-	if utils.DEBUG {
-		log.Printf("%s res.Payload: %s\n", debugPrefix, res.Payload)
 	}
 }
 

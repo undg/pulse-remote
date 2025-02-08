@@ -7,24 +7,24 @@ import (
 
 func TestMarshalJSON(t *testing.T) {
 	response := Response{
-		Action:  string(ActionGetCards),
+		Action:  string(ActionGetStatus),
 		Status:  StatusSuccess,
 		Payload: "test payload",
 	}
 
-	expected := `{"action":"GetCards","payload":"test payload","status":4000}`
+	expected := `{"action":"GetStatus","payload":"test payload","status":4000}`
 
 	assertJSON(t, response, expected)
 }
 
 func TestMarshalJSONWithError(t *testing.T) {
 	response := Response{
-		Action: string(ActionGetCards),
+		Action: string(ActionGetStatus),
 		Status: StatusError,
 		Error:  "test error",
 	}
 
-	expected := `{"action":"GetCards","error":"test error","status":4001}`
+	expected := `{"action":"GetStatus","error":"test error","status":4001}`
 
 	assertJSON(t, response, expected)
 }
