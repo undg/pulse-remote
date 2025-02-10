@@ -79,22 +79,31 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			status := pactl.GetStatus()
 			res.Payload = status
 
-		// Audio device
+		// SINKS, Speakers
 		case json.ActionSetSinkVolume:
 			handleSetSinkVolume(&msg, &res)
-
 		case json.ActionSetSinkMuted:
 			handleSetSinkMuted(&msg, &res)
 
-		// App under Audio device
+		// App's under SiNKS
 		case json.ActionSetSinkInputVolume:
 			handleSetSinkInputVolume(&msg, &res)
-
 		case json.ActionSetSinkInputMuted:
 			handleSetSinkInputMuted(&msg, &res)
-
 		case json.ActionMoveSinkInput:
 			handleMoveSinkInput(&msg, &res)
+
+		// SOURCES, Microphones
+		case json.ActionSetSourceVolume:
+			print("set source")
+		case json.ActionSetSourceMuted:
+			print("mute source")
+
+		// App's under SOURCES
+		case json.ActionSetSourceInputVolume:
+			print("set App under source volume")
+		case json.ActionSetSourceInputMuted:
+			print("mute App under source")
 
 		case json.ActionMoveSourceOutput:
 			handleMoveSourceOutput(&msg, &res)
