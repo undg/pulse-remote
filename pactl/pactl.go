@@ -110,6 +110,18 @@ func MoveSinkInput(sinkInputID string, sinkName string) {
 	}
 }
 
+func SetSourceVolume(sourceName string, volume string) {
+	errPrefix := "ERROR [SetSourceVolume()]"
+	volumeInPercent := fmt.Sprint(volume) + "%"
+
+	cmd := exec.Command("pactl", "set-s-volume", sourceName, volumeInPercent)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Printf("%s pactl set-source-volume: %s\n", errPrefix, err)
+		log.Printf("%s pactl set-source-volume: {SOURCE_NAME: %s ; VOLUME: %s}\n", errPrefix, sourceName, volumeInPercent)
+	}
+}
+
 func MoveSourceOutput(sourceOutputID string, sourceName string) {
 	errPrefix := "Error [MoveSourceOutput()]"
 
