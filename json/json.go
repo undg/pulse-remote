@@ -13,27 +13,53 @@ const (
 	// Metadata about build
 	ActionGetBuildInfo Action = "GetBuildInfo"
 
+	// SINKS, e.g. Speakers
 	ActionSetSinkVolume Action = "SetSinkVolume"
 	ActionSetSinkMuted  Action = "SetSinkMuted"
 
+	// Apps playing audio
 	ActionSetSinkInputVolume Action = "SetSinkInputVolume"
 	ActionSetSinkInputMuted  Action = "SetSinkInputMuted"
+	// Move App to different SINK
+	ActionMoveSinkInput Action = "MoveSinkInput"
 
-	ActionMoveSinkInput    Action = "MoveSinkInput"
+	// SOURCES, e.g. Microphones
+	ActionSetSourceVolume Action = "SetSourceVolume"
+	ActionSetSourceMuted  Action = "SetSourceMuted"
+
+	// Apps active access to microphones
+	ActionSetSourceInputVolume Action = "SetSourceInputVolume"
+	ActionSetSourceInputMuted  Action = "SetSourceInputMuted"
+	// Move App to different SOURCE
 	ActionMoveSourceOutput Action = "MoveSourceOutput"
 )
 
 var AvailableCommands = []Action{
+	// Get composed informations about all sinks, sources, inputs and build
 	ActionGetStatus,
+
+	// Metadata about build
 	ActionGetBuildInfo,
 
+	// SINKS, e.g. Speakers
 	ActionSetSinkVolume,
 	ActionSetSinkMuted,
 
+	// Apps playing audio
 	ActionSetSinkInputVolume,
 	ActionSetSinkInputMuted,
-
+	// Move App to different SINK
 	ActionMoveSinkInput,
+
+	// SOURCES, e.g. Microphones
+	ActionSetSourceVolume,
+	ActionSetSourceMuted,
+
+	// Apps active access to microphones
+	ActionSetSourceInputVolume,
+	ActionSetSourceInputMuted,
+	// Move App to different SOURCE
+	ActionMoveSourceOutput,
 }
 
 // Message is an request from the client
