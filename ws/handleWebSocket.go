@@ -97,7 +97,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		case json.ActionSetSourceVolume:
 			handleSetSourceVolume(&msg, &res)
 		case json.ActionSetSourceMuted:
-			print("mute source")
+			handleSetSourceMuted(&msg, &res)
 
 		// App's under SOURCES
 		case json.ActionSetSourceInputVolume:

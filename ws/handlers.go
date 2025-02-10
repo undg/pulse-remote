@@ -149,6 +149,29 @@ func handleSetSourceVolume(msg *json.Message, res *json.Response) {
 	}
 }
 
+func handleSetSourceMuted(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleSetSourceMuted()]:"
+
+	if sourceInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sourceInfo["name"].(string)
+		if !ok {
+			log.Printf("%s sourceInfo['name'].(string) NOT OK\n", errPrefix)
+		}
+
+		muted, ok := sourceInfo["muted"].(bool)
+		if !ok {
+			log.Printf("%s sourceInfo['muted'].(bool) NOT OK\n", errPrefix)
+		}
+
+		pactl.SetSourceMuted(name, muted)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid source information format"
+		res.Status = json.StatusActionError
+	}
+}
+
 func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
 	errPrefix := "Error [handleMoveSourceOutput()]"
 
