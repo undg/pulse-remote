@@ -138,6 +138,34 @@ func SetSourceMuted(sourceName string, muted bool) {
 	}
 }
 
+func SetSourceInputVolume(sourceInputID string, volume string) {
+	errPrefix := "ERROR [SetSourceInputVolume()]"
+	volumeInPercent := volume + "%"
+
+	cmd := exec.Command("pactl", "set-source-input-volume", sourceInputID, volumeInPercent)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Printf("%s pactl set-source-input-volume: %s\n", errPrefix, err)
+		log.Printf("%s pactl set-source-input-volume: {SOURCE_INPUT_ID: %s ; VOLUME: %s}\n", errPrefix, sourceInputID, volumeInPercent)
+	}
+}
+
+func SetSourceInputMuted(sourceInputID string, muted bool) {
+	errPrefix := "ERROR [SetSourceInputMuted()]"
+
+	mutedCmd := "false"
+	if muted {
+		mutedCmd = "true"
+	}
+
+	cmd := exec.Command("pactl", "set-source-input-mute", sourceInputID, mutedCmd)
+	_, err := cmd.Output()
+	if err != nil {
+		log.Printf("%s pactl set-source-mute: %s\n", errPrefix, err)
+		log.Printf("%s pactl set-source-mute: {SOURCE_INPUT_ID: %s ; MUTED: %s}\n", errPrefix, sourceInputID, mutedCmd)
+	}
+}
+
 func MoveSourceOutput(sourceOutputID string, sourceName string) {
 	errPrefix := "Error [MoveSourceOutput()]"
 

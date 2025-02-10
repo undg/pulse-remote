@@ -172,6 +172,52 @@ func handleSetSourceMuted(msg *json.Message, res *json.Response) {
 	}
 }
 
+func handleSetSourceInputVolume(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleSetSourceInputVolume()]:"
+
+	if sourceInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		id, ok := sourceInputInfo["id"].(float64)
+		if !ok {
+			log.Printf("%s sourceInfo['id'].(float64) NOT OK\n", errPrefix)
+		}
+
+		volume, ok := sourceInputInfo["volume"].(float64)
+		if !ok {
+			log.Printf("%s sourceInfo['volume'].(float64) NOT OK\n", errPrefix)
+		}
+
+		pactl.SetSourceInputVolume(fmt.Sprintf("%.0f", id), fmt.Sprintf("%.2f", volume))
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid source information format"
+		res.Status = json.StatusActionError
+	}
+}
+
+func handleSetSourceInputMuted(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleSetSourceInputMuted()]:"
+
+	if sourceInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		id, ok := sourceInputInfo["id"].(float64)
+		if !ok {
+			log.Printf("%s sourceInfo['id'].(float64) NOT OK\n", errPrefix)
+		}
+
+		muted, ok := sourceInputInfo["muted"].(bool)
+		if !ok {
+			log.Printf("%s sourceInfo['muted'].(bool) NOT OK\n", errPrefix)
+		}
+
+		pactl.SetSourceInputMuted(fmt.Sprintf("%.0f", id), muted)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid source information format"
+		res.Status = json.StatusActionError
+	}
+}
+
 func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
 	errPrefix := "Error [handleMoveSourceOutput()]"
 

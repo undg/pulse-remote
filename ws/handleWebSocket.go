@@ -101,9 +101,9 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 		// App's under SOURCES
 		case json.ActionSetSourceInputVolume:
-			print("set App under source volume")
+			handleSetSourceInputVolume(&msg, &res)
 		case json.ActionSetSourceInputMuted:
-			print("mute App under source")
+			handleSetSourceInputMuted(&msg, &res)
 
 		case json.ActionMoveSourceOutput:
 			handleMoveSourceOutput(&msg, &res)
