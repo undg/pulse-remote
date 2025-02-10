@@ -125,6 +125,30 @@ func handleMoveSinkInput(msg *json.Message, res *json.Response) {
 	}
 }
 
+// SOURCES, Microphones
+func handleSetSourceVolume(msg *json.Message, res *json.Response) {
+	errPrefix := "ERROR [handleSetSourceVolume()]"
+
+	if sourceInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sourceInfo["name"].(string)
+		if !ok {
+			log.Printf("%s sourceInfo['name'].(string) NOT OK\n", errPrefix)
+		}
+
+		volume, ok := sourceInfo["volume"].(float64)
+		if !ok {
+			log.Printf("%s sourceInfo['volume'].(float64) NOT OK\n", errPrefix)
+		}
+
+		pactl.SetSourceVolume(name, fmt.Sprintf("%.2f", volume))
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid source information format"
+		res.Status = json.StatusActionError
+	}
+}
+
 func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
 	errPrefix := "Error [handleMoveSourceOutput()]"
 
