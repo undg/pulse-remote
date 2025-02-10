@@ -2,7 +2,6 @@ package pactl
 
 import (
 	"bufio"
-	"fmt"
 	"log"
 	"os/exec"
 	"regexp"
@@ -44,137 +43,45 @@ type App struct {
 }
 
 func SetSinkVolume(sinkName string, volume string) {
-	errPrefix := "ERROR [SetSinkVolume()]"
-	volumeInPercent := fmt.Sprint(volume) + "%"
-
-	cmd := exec.Command("pactl", "set-sink-volume", sinkName, volumeInPercent)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl set-sink-volume: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-sink-volume: {SINK_NAME: %s ; VOLUME: %s}\n", errPrefix, sinkName, volumeInPercent)
-	}
+	setVolume("sink", sinkName, volume)
 }
 
 func SetSinkMuted(sinkName string, muted bool) {
-	errPrefix := "ERROR [SetSinkMuted()]"
-
-	mutedCmd := "false"
-	if muted {
-		mutedCmd = "true"
-	}
-
-	cmd := exec.Command("pactl", "set-sink-mute", sinkName, mutedCmd)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl set-sink-mute: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-sink-mute: {SINK_NAME: %s ; MUTED: %s}\n", errPrefix, sinkName, mutedCmd)
-	}
+	setMuted("sink", sinkName, muted)
 }
 
 func SetSinkInputVolume(sinkInputID string, volume string) {
-	errPrefix := "ERROR [SetSinkInputVolume()]"
-	volumeInPercent := volume + "%"
-
-	cmd := exec.Command("pactl", "set-sink-input-volume", sinkInputID, volumeInPercent)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl set-sink-input-volume: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-sink-input-volume: {SINK_INPUT_ID: %s ; VOLUME: %s}\n", errPrefix, sinkInputID, volumeInPercent)
-	}
+	setVolume("sink-input", sinkInputID, volume)
 }
 
 func SetSinkInputMuted(sinkInputID string, muted bool) {
-	errPrefix := "ERROR [SetSinkInputMuted()]"
-
-	mutedCmd := "false"
-	if muted {
-		mutedCmd = "true"
-	}
-
-	cmd := exec.Command("pactl", "set-sink-input-mute", sinkInputID, mutedCmd)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl set-sink-mute: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-sink-mute: {SINK_INPUT_ID: %s ; MUTED: %s}\n", errPrefix, sinkInputID, mutedCmd)
-	}
+	setMuted("sink-input", sinkInputID, muted)
 }
 
 func MoveSinkInput(sinkInputID string, sinkName string) {
-	errPrefix := "Error [MoveSinkInput()]"
+	moveApp("sink-input", sinkInputID, sinkName)
 
-	cmd := exec.Command("pactl", "move-sink-input", sinkInputID, sinkName)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl move-sink-input: %s\n", errPrefix, err)
-		log.Printf("%s pactl move-sink-input: {SINK_INPUT_ID: %s ; SINK_NAME: %s}\n", errPrefix, sinkInputID, sinkName)
-	}
 }
 
 func SetSourceVolume(sourceName string, volume string) {
-	errPrefix := "ERROR [SetSourceVolume()]"
-	volumeInPercent := fmt.Sprint(volume) + "%"
-
-	cmd := exec.Command("pactl", "set-s-volume", sourceName, volumeInPercent)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl set-source-volume: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-source-volume: {SOURCE_NAME: %s ; VOLUME: %s}\n", errPrefix, sourceName, volumeInPercent)
-	}
+	setVolume("source", sourceName, volume)
 }
 
 func SetSourceMuted(sourceName string, muted bool) {
-	errPrefix := "ERROR [SetSourceMuted()]"
+	setMuted("source", sourceName, muted)
 
-	mutedCmd := "false"
-	if muted {
-		mutedCmd = "true"
-	}
-
-	cmd := exec.Command("pactl", "set-source-mute", sourceName, mutedCmd)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl set-source-mute: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-source-mute: {SOURCE_NAME: %s ; MUTED: %s}\n", errPrefix, sourceName, mutedCmd)
-	}
 }
 
 func SetSourceInputVolume(sourceInputID string, volume string) {
-	errPrefix := "ERROR [SetSourceInputVolume()]"
-	volumeInPercent := volume + "%"
-
-	cmd := exec.Command("pactl", "set-source-input-volume", sourceInputID, volumeInPercent)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl set-source-input-volume: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-source-input-volume: {SOURCE_INPUT_ID: %s ; VOLUME: %s}\n", errPrefix, sourceInputID, volumeInPercent)
-	}
+	setVolume("source-input", sourceInputID, volume)
 }
 
 func SetSourceInputMuted(sourceInputID string, muted bool) {
-	errPrefix := "ERROR [SetSourceInputMuted()]"
-
-	mutedCmd := "false"
-	if muted {
-		mutedCmd = "true"
-	}
-
-	cmd := exec.Command("pactl", "set-source-input-mute", sourceInputID, mutedCmd)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl set-source-mute: %s\n", errPrefix, err)
-		log.Printf("%s pactl set-source-mute: {SOURCE_INPUT_ID: %s ; MUTED: %s}\n", errPrefix, sourceInputID, mutedCmd)
-	}
+	setMuted("source-input", sourceInputID, muted)
 }
 
 func MoveSourceOutput(sourceOutputID string, sourceName string) {
-	errPrefix := "Error [MoveSourceOutput()]"
-
-	cmd := exec.Command("pactl", "move-source-output", sourceOutputID, sourceName)
-	_, err := cmd.Output()
-	if err != nil {
-		log.Printf("%s pactl move-source-output: %s\n", errPrefix, err)
-		log.Printf("%s pactl move-source-output: {SOURCE_OUTPUT_ID: %s ; SOURCE_NAME: %s}\n", errPrefix, sourceOutputID, sourceName)
-	}
+	moveApp("source-output", sourceOutputID, sourceName)
 }
 
 func parseOutput(output string) Output {
