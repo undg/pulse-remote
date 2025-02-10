@@ -11,16 +11,16 @@ import (
 //
 // Parameters:
 //   - kind: device type ("sink", "sink-input", "source", "source-input")
-//   - nameOrId: name for sinks/sources, numeric ID for inputs
+//   - nameOrID: name for sinks/sources, numeric ID for inputs
 //   - volume: volume level
-func setVolume(kind string, nameOrId string, volume string) {
-	errPrefix := "ERROR [setVolume(" + kind + ", " + nameOrId + ", " + volume + ")]"
+func setVolume(kind string, nameOrID string, volume string) {
+	errPrefix := "ERROR [setVolume(" + kind + ", " + nameOrID + ", " + volume + ")]"
 	volumeInPercent := fmt.Sprint(volume) + "%"
 
-	cmd := exec.Command("pactl", "set-"+kind+"-volume", nameOrId, volumeInPercent)
+	cmd := exec.Command("pactl", "set-"+kind+"-volume", nameOrID, volumeInPercent)
 	_, err := cmd.Output()
 	if err != nil {
-		log.Printf("%s $> pactl set-"+kind+"-volume"+nameOrId+" "+volumeInPercent+": %s\n", errPrefix, err)
+		log.Printf("%s $> pactl set-"+kind+"-volume"+nameOrID+" "+volumeInPercent+": %s\n", errPrefix, err)
 	}
 }
 
@@ -28,17 +28,17 @@ func setVolume(kind string, nameOrId string, volume string) {
 //
 // Parameters:
 //   - kind: device type ("sink", "sink-input", "source", "source-input")
-//   - nameOrId: name for sinks/sources, numeric ID for inputs
+//   - nameOrID: name for sinks/sources, numeric ID for inputs
 //   - muted: muted state
-func setMuted(kind string, nameOrId string, muted bool) {
+func setMuted(kind string, nameOrID string, muted bool) {
 	mutedStr := strconv.FormatBool(muted)
-	errPrefix := "ERROR [setMuted(" + kind + ", " + nameOrId + ", " + mutedStr + ")]"
+	errPrefix := "ERROR [setMuted(" + kind + ", " + nameOrID + ", " + mutedStr + ")]"
 
-	cmd := exec.Command("pactl", "set-"+kind+"-mute", nameOrId, mutedStr)
+	cmd := exec.Command("pactl", "set-"+kind+"-mute", nameOrID, mutedStr)
 
 	_, err := cmd.Output()
 	if err != nil {
-		log.Printf("%s $> pactl set-"+kind+"-mute "+nameOrId+" "+mutedStr+": %s\n", errPrefix, err)
+		log.Printf("%s $> pactl set-"+kind+"-mute "+nameOrID+" "+mutedStr+": %s\n", errPrefix, err)
 	}
 }
 
@@ -46,7 +46,7 @@ func setMuted(kind string, nameOrId string, muted bool) {
 //
 // Parameters:
 //   - kind: device type ("sink-input", "source-output")
-//   - appId: sink-input ID or source-output ID
+//   - appID: sink-input ID or source-output ID
 //   - deviceName: sink name or source name
 func moveApp(kind string, appID string, deviceName string) {
 	errPrefix := "ERROR [moveApp(" + kind + ", " + appID + ", " + deviceName + ")]"

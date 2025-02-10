@@ -11,7 +11,7 @@ var (
 	writeMutex sync.Mutex
 )
 
-func safeWriteJson(conn *websocket.Conn, v interface{}) error {
+func safeWriteJSON(conn *websocket.Conn, v interface{}) error {
 	writeMutex.Lock()
 	defer writeMutex.Unlock()
 	return conn.WriteJSON(v)

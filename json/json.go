@@ -67,7 +67,7 @@ var AvailableCommands = []Action{
 // Message is an request from the client
 type Message struct {
 	// Actions listed in availableCommands slice
-	Action Action `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..."enum:"GetStatus,GetBuildInfo,SetSinkVolume,SetSinkMuted,SetSinkInputVolume,SetSinkInputMuted,MoveSinkInput,SetSourceVolume,SetSourceMuted,SetSourceInputVolume,SetSourceInputMuted,MoveSourceOutput"`
+	Action Action `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..." enum:"GetStatus,GetBuildInfo,SetSinkVolume,SetSinkMuted,SetSinkInputVolume,SetSinkInputMuted,MoveSinkInput,SetSourceVolume,SetSourceMuted,SetSourceInputVolume,SetSourceInputMuted,MoveSourceOutput"`
 	// Paylod send with Set* actions if necessary
 	Payload interface{} `json:"payload,omitempty" doc:"Paylod send with Set* actions if necessary"`
 }

@@ -50,7 +50,7 @@ func BroadcastUpdates() {
 		updatedClients := 0
 		for conn := range clients {
 			conn.SetWriteDeadline(time.Now().Add(writeWait))
-			err := safeWriteJson(conn, res)
+			err := safeWriteJSON(conn, res)
 			if err != nil {
 				log.Printf("Error broadcast VOLUME update to client: %v\n", err)
 				conn.Close()

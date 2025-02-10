@@ -42,7 +42,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		Payload: status,
 	}
 
-	if err := safeWriteJson(conn, initialResponse); err != nil {
+	if err := safeWriteJSON(conn, initialResponse); err != nil {
 		log.Printf("Error sending initial sinks data: %v\n", err)
 	}
 
@@ -115,7 +115,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 		handleServerLog(&msg, &res)
 
-		if err := safeWriteJson(conn, res); err != nil {
+		if err := safeWriteJSON(conn, res); err != nil {
 			log.Printf("Error writing JSON: %v\n", err)
 			break
 		}
