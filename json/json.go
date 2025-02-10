@@ -62,10 +62,12 @@ var AvailableCommands = []Action{
 	ActionMoveSourceOutput,
 }
 
+// @TODO (undg) 2025-02-10: generate enum's. Check https://github.com/danielgtaylor/huma
+
 // Message is an request from the client
 type Message struct {
 	// Actions listed in availableCommands slice
-	Action Action `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..."`
+	Action Action `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..."enum:"GetStatus,GetBuildInfo,SetSinkVolume,SetSinkMuted,SetSinkInputVolume,SetSinkInputMuted,MoveSinkInput,SetSourceVolume,SetSourceMuted,SetSourceInputVolume,SetSourceInputMuted,MoveSourceOutput"`
 	// Paylod send with Set* actions if necessary
 	Payload interface{} `json:"payload,omitempty" doc:"Paylod send with Set* actions if necessary"`
 }
