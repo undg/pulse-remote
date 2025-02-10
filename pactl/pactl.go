@@ -11,37 +11,6 @@ import (
 	"github.com/undg/go-prapi/buildinfo"
 )
 
-type Status = struct {
-	Outputs   []Output            `json:"outputs" doc:"List of output devices"`
-	Apps      []App               `json:"apps" doc:"List of applications"`
-	Sources   []Source            `json:"sources" doc:"List of microphones and other sources"`
-	BuildInfo buildinfo.BuildInfo `json:"buildInfo" doc:"Build information"`
-}
-
-type Output struct {
-	ID     int    `json:"id" doc:"The id of the sink. Same  as name"`
-	Name   string `json:"name" doc:"The name of the sink. Same as id"`
-	Label  string `json:"label" doc:"Human-readable label for the sink"`
-	Volume int    `json:"volume" doc:"Current volume level of the sink"`
-	Muted  bool   `json:"muted" doc:"Whether the sink is muted"`
-}
-
-type Source struct {
-	ID     int    `json:"id" doc:"The id of the source. Same  as name"`
-	Name   string `json:"name" doc:"The name of the source. Same as id"`
-	Label  string `json:"label" doc:"Human-readable label for the source"`
-	Volume int    `json:"volume" doc:"Current volume level of the source"`
-	Muted  bool   `json:"muted" doc:"Whether the source is muted"`
-}
-
-type App struct {
-	ID       int    `json:"id" doc:"The id of the sink. Same  as name"`
-	OutputID int    `json:"outputId" doc:"Id of parrent device, same as output.id"`
-	Label    string `json:"label" doc:"Human-readable label for the sink"`
-	Volume   int    `json:"volume" doc:"Current volume level of the sink"`
-	Muted    bool   `json:"muted" doc:"Whether the sink is muted"`
-}
-
 func SetSinkVolume(sinkName string, volume string) {
 	setVolume("sink", sinkName, volume)
 }
@@ -123,18 +92,33 @@ func GetOutputs() ([]Output, error) {
 	return outputs, nil
 }
 
-func GetApps() []App {
+func GetApps() ([]App, error) {
 	cmd := exec.Command("pactl", "list", "sink-inputs")
-	out, _ := cmd.Output()
+	out, err := cmd.Output()
+	if err != nil {
+		return nil, err
+	}
 
-	re, _ := regexp.Compile(`Sink Input #(\d+)[\s\S]*?Sink: (\d+)[\s\S]*?Mute: (yes|no)[\s\S]*?Volume:.*?(\d+)%[\s\S]*?application\.name = "(.*?)"`)
+	re, err := regexp.Compile(`Sink Input #(\d+)[\s\S]*?Sink: (\d+)[\s\S]*?Mute: (yes|no)[\s\S]*?Volume:.*?(\d+)%[\s\S]*?application\.name = "(.*?)"`)
+	if err != nil {
+		return nil, err
+	}
 	matches := re.FindAllStringSubmatch(string(out), -1)
 
 	apps := make([]App, len(matches))
 	for i, m := range matches {
-		id, _ := strconv.Atoi(m[1])
-		outputID, _ := strconv.Atoi(m[2])
-		volume, _ := strconv.Atoi(m[4])
+		id, err := strconv.Atoi(m[1])
+		if err != nil {
+			return nil, err
+		}
+		outputID, err := strconv.Atoi(m[2])
+		if err != nil {
+			return nil, err
+		}
+		volume, err := strconv.Atoi(m[4])
+		if err != nil {
+			return nil, err
+		}
 		apps[i] = App{
 			ID:       id,
 			OutputID: outputID,
@@ -144,7 +128,7 @@ func GetApps() []App {
 		}
 	}
 
-	return apps
+	return apps, nil
 }
 
 func parseSources(output string) Source {
@@ -201,7 +185,7 @@ func ListenForChanges(callback func()) {
 }
 
 func GetStatus() Status {
-	errPrefix := "ERROR [GetStatus()]"
+	errPrefix := "ERROR [GetStatus()] -> "
 
 	outputs, err := GetOutputs()
 	if err != nil {
@@ -213,7 +197,10 @@ func GetStatus() Status {
 		log.Printf("%s GetSources(): %s", errPrefix, err)
 	}
 
-	apps := GetApps()
+	apps, err := GetApps()
+	if err != nil {
+		log.Printf("%s GetApps(): %s", errPrefix, err)
+	}
 
 	bi := buildinfo.Get()
 
