@@ -105,3 +105,4 @@ func (r Response) MarshalJSON() ([]byte, error) {
 
 	return json.Marshal(data)
 }
+
