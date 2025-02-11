@@ -137,19 +137,24 @@ func parseSources(output string) Source {
 	descRe, _ := regexp.Compile(`Description: (.+)`)
 	volumeRe, _ := regexp.Compile(`Volume: .+?(\d+)%`)
 	muteRe, _ := regexp.Compile(`Mute: (yes|no)`)
+	monitorRe, _ := regexp.Compile(`Monitor of Sink: (.+)`) // n/a or name of the Sink
 
 	id, _ := strconv.Atoi(idRe.FindStringSubmatch(output)[1])
 	name := nameRe.FindStringSubmatch(output)[1]
 	desc := descRe.FindStringSubmatch(output)[1]
 	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
-	mute := muteRe.FindStringSubmatch(output)[1] == "yes"
+	muted := muteRe.FindStringSubmatch(output)[1] == "yes"
+	monitored := monitorRe.FindStringSubmatch(output)[1] == "n/a"
+	monitor := monitorRe.FindStringSubmatch(output)[1]
 
 	return Source{
-		ID:     id,
-		Name:   name,
-		Label:  desc,
-		Volume: volume,
-		Muted:  mute,
+		ID:        id,
+		Name:      name,
+		Label:     desc,
+		Volume:    volume,
+		Muted:     muted,
+		Monitor:   monitor,
+		Monitored: monitored,
 	}
 }
 

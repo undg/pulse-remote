@@ -18,11 +18,13 @@ type Output struct {
 }
 
 type Source struct {
-	ID     int    `json:"id" doc:"The id of the source. Same  as name"`
-	Name   string `json:"name" doc:"The name of the source. Same as id"`
-	Label  string `json:"label" doc:"Human-readable label for the source"`
-	Volume int    `json:"volume" doc:"Current volume level of the source"`
-	Muted  bool   `json:"muted" doc:"Whether the source is muted"`
+	ID        int    `json:"id" doc:"Unique numeric identifier of the source"`
+	Name      string `json:"name" doc:"Unique string identifier of the source"`
+	Label     string `json:"label" doc:"Human-readable label for the source"`
+	Volume    int    `json:"volume" doc:"Current volume level of the source"`
+	Muted     bool   `json:"muted" doc:"Whether the source is muted"`
+	Monitor   string `json:"monitor" doc:"Name of monitor source capturing this source's output"`
+	Monitored bool   `json:"monitored" doc:"Whether source is being monitored"`
 }
 
 type App struct {
