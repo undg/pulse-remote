@@ -144,7 +144,7 @@ func parseSources(output string) Source {
 	desc := descRe.FindStringSubmatch(output)[1]
 	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
 	muted := muteRe.FindStringSubmatch(output)[1] == "yes"
-	monitored := monitorRe.FindStringSubmatch(output)[1] == "n/a"
+	monitored := monitorRe.FindStringSubmatch(output)[1] != "n/a"
 	monitor := monitorRe.FindStringSubmatch(output)[1]
 
 	return Source{
