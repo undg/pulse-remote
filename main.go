@@ -7,7 +7,7 @@ import (
 	"os"
 
 	"github.com/undg/go-prapi/buildinfo"
-	"github.com/undg/go-prapi/json"
+	prapiJSON "github.com/undg/go-prapi/json"
 	"github.com/undg/go-prapi/utils"
 	"github.com/undg/go-prapi/ws"
 )
@@ -18,11 +18,13 @@ func startServer(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/v1/schema/status":
-			json.ServeStatusSchemaJSON(w, r)
+			prapiJSON.ServeStatusSchemaJSON(w, r)
 		case "/api/v1/schema/message":
-			json.ServeMessageSchemaJSON(w, r)
+			prapiJSON.ServeMessageSchemaJSON(w, r)
 		case "/api/v1/schema/response":
-			json.ServeResponseSchemaJSON(w, r)
+			prapiJSON.ServeResponseSchemaJSON(w, r)
+		case "/api/v1/status":
+			prapiJSON.ServeStatusRestJSON(w, r)
 		case "/api/v1/ws":
 			ws.HandleWebSocket(w, r)
 		default:

@@ -29,6 +29,16 @@ func serveSchemaJSON(w http.ResponseWriter, t reflect.Type) {
 	fmt.Fprint(w, string(b))
 }
 
+func serveRestJSON(w http.ResponseWriter, restJSON interface{}) {
+
+	w.Header().Set("Content-Type", "application/json")
+
+	if err := json.NewEncoder(w).Encode(restJSON); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+}
+
 func ServeStatusSchemaJSON(w http.ResponseWriter, r *http.Request) {
 	serveSchemaJSON(w, reflect.TypeOf(pactl.Status{}))
 }
@@ -39,4 +49,8 @@ func ServeMessageSchemaJSON(w http.ResponseWriter, r *http.Request) {
 
 func ServeResponseSchemaJSON(w http.ResponseWriter, r *http.Request) {
 	serveSchemaJSON(w, reflect.TypeOf(Response{}))
+}
+
+func ServeStatusRestJSON(w http.ResponseWriter, r *http.Request) {
+	serveRestJSON(w, pactl.GetStatus())
 }
