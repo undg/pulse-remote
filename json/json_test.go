@@ -32,7 +32,7 @@ func TestMarshalJSONWithError(t *testing.T) {
 func assertJSON(t *testing.T, response Response, expected string) {
 	result, err := json.Marshal(response)
 	if err != nil {
-		t.Fatalf("Error marshaling JSON: %v", err)
+		t.Fatalf("ERROR marshaling JSON: %v", err)
 	}
 
 	if string(result) != expected {

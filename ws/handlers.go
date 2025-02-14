@@ -103,17 +103,17 @@ func handleSetSinkInputMuted(msg *json.Message, res *json.Response) {
 }
 
 func handleMoveSinkInput(msg *json.Message, res *json.Response) {
-	errPrefix := "Error [handleMoveSinkInput()]"
+	errPrefix := "ERROR [handleMoveSinkInput()]"
 
 	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
-		sinkInputID, ok := sinkInputInfo["inputId"].(float64)
+		sinkInputID, ok := sinkInputInfo["id"].(float64)
 		if !ok {
-			log.Printf("%s sinkInfo['inputId'].(float64) NOT OK\n", errPrefix)
+			log.Printf("%s sinkInfo['id'].(float64) NOT OK\n", errPrefix)
 		}
 
-		sinkName, ok := sinkInputInfo["sinkName"].(string)
+		sinkName, ok := sinkInputInfo["name"].(string)
 		if !ok {
-			log.Printf("%s sinkInfo['sinkName'].(string) NOT OK\n", errPrefix)
+			log.Printf("%s sinkInfo['name'].(string) NOT OK\n", errPrefix)
 		}
 
 		pactl.MoveSinkInput(fmt.Sprintf("%.0f", sinkInputID), sinkName)
@@ -219,7 +219,7 @@ func handleSetSourceInputMuted(msg *json.Message, res *json.Response) {
 }
 
 func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
-	errPrefix := "Error [handleMoveSourceOutput()]"
+	errPrefix := "ERROR [handleMoveSourceOutput()]"
 
 	if sourceOutputInfo, ok := msg.Payload.(map[string]interface{}); ok {
 		sourceOutputID, ok := sourceOutputInfo["outputId"].(float64)

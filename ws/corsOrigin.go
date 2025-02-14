@@ -16,19 +16,26 @@ var upgrader = websocket.Upgrader{
 }
 
 func upgraderCheckOrigin() {
+	errPrefix := "ERROR [upgraderCheckOrigin()]: "
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		host, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
-			log.Printf("Error splitting host and port: %v\n", err)
+			log.Printf("%s splitting host and port: %v\n", errPrefix, err)
 			return false
 		}
 
 		ip := net.ParseIP(host)
 		if ip == nil {
-			log.Printf("Invalid IP: %s\n", host)
+			log.Printf("%s Can't parse IP: %s\n", errPrefix, host)
 			return false
 		}
 
-		return utils.IsLocalIP(ip) || strings.HasPrefix(r.Host, "localhost")
+		if utils.IsLocalIP(ip) || strings.HasPrefix(r.Host, "localhost") {
+			return true
+		} else {
+			log.Printf("%s IP is not allowed: %s\n", errPrefix, host)
+			return false
+		}
+
 	}
 }
