@@ -103,7 +103,7 @@ func handleSetSinkInputMuted(msg *json.Message, res *json.Response) {
 }
 
 func handleMoveSinkInput(msg *json.Message, res *json.Response) {
-	errPrefix := "Error [handleMoveSinkInput()]"
+	errPrefix := "ERROR [handleMoveSinkInput()]"
 
 	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
 		sinkInputID, ok := sinkInputInfo["id"].(float64)
@@ -219,7 +219,7 @@ func handleSetSourceInputMuted(msg *json.Message, res *json.Response) {
 }
 
 func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
-	errPrefix := "Error [handleMoveSourceOutput()]"
+	errPrefix := "ERROR [handleMoveSourceOutput()]"
 
 	if sourceOutputInfo, ok := msg.Payload.(map[string]interface{}); ok {
 		sourceOutputID, ok := sourceOutputInfo["outputId"].(float64)

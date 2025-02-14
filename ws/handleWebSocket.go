@@ -22,7 +22,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("Error upgrading to WebSocket: %v\n", err)
+		log.Printf("ERROR upgrading to WebSocket: %v\n", err)
 		return
 	}
 
@@ -43,7 +43,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := safeWriteJSON(conn, initialResponse); err != nil {
-		log.Printf("Error sending initial sinks data: %v\n", err)
+		log.Printf("ERROR sending initial sinks data: %v\n", err)
 	}
 
 	// Cleanup after client is disconnected
@@ -62,7 +62,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		err := conn.ReadJSON(&msg)
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("Error reading JSON: %v\n", err)
+				log.Printf("ERROR reading JSON: %v\n", err)
 			}
 			break
 		}
@@ -116,7 +116,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		handleServerLog(&msg, &res)
 
 		if err := safeWriteJSON(conn, res); err != nil {
-			log.Printf("Error writing JSON: %v\n", err)
+			log.Printf("ERROR writing JSON: %v\n", err)
 			break
 		}
 	}

@@ -60,6 +60,7 @@ func main() {
 `)
 
 	fmt.Println("\n🔥 Igniting server on ws://" + ip + utils.PORT + "\n")
+	fmt.Println("🔥 webapp http://" + ip + utils.PORT + "\n")
 
 	mux := http.NewServeMux()
 
