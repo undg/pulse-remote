@@ -27,6 +27,7 @@ func init() {
 
 	debug := os.Getenv("DEBUG")
 
+	// @TODO (undg) 2025-02-14: convert number string to number and check if it's greater than TRACE level, so DEBUG=999 could be valid max.
 	switch debug {
 	case "TRACE", "3":
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
