@@ -241,17 +241,6 @@ func handleMoveSourceOutput(msg *json.Message, res *json.Response) {
 	}
 }
 
-func handleGetSchema(res *json.Response) {
-	debugPrefix := "DEBUG [handleGetSchema()]"
-	// schema := json.GetSchemaJSON()
-	//
-	// res.Payload = schema
-	if utils.DEBUG {
-		log.Printf("%s res.Action: %s\n", debugPrefix, res.Action)
-		log.Printf("%s res.Payload: %s\n", debugPrefix, res.Payload)
-	}
-}
-
 func handleServerLog(msg *json.Message, res *json.Response) {
 	errPrefix := "ERROR [handleServerLog()]"
 
