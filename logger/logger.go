@@ -2,6 +2,7 @@ package logger
 
 import (
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/rs/zerolog"
@@ -27,7 +28,16 @@ func init() {
 
 	debug := os.Getenv("DEBUG")
 
-	// @TODO (undg) 2025-02-14: convert number string to number and check if it's greater than TRACE level, so DEBUG=999 could be valid max.
+	isNumber := true
+	level, err := strconv.ParseInt(debug, 10, 64)
+	if err != nil {
+		isNumber = false
+	}
+
+	if isNumber && level >= 3 {
+		zerolog.SetGlobalLevel(zerolog.TraceLevel)
+	}
+
 	switch debug {
 	case "TRACE", "3":
 		zerolog.SetGlobalLevel(zerolog.TraceLevel)
