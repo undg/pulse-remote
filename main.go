@@ -61,14 +61,21 @@ func main() {
   DEBUG:      `, logger.DebugEnv, `
 └───────────────────────────────────────────────────┘
 `)
+	fmt.Println("🔥 Igniting server on ws://" + ip + utils.PORT)
+	fmt.Println("🔥 WebApp http://" + ip + utils.PORT + "\n")
+
+	fmt.Print(`
+──────────────────────────────────────────────────────────────
+`)
 	logger.Trace().Str("Trace", "ON").Msg("Log LEVEL")
 	logger.Debug().Str("Debug", "ON").Msg("Log LEVEL")
 	logger.Info().Str("Info", "ON").Msg("Log LEVEL")
 	logger.Warn().Str("Warn", "ON").Msg("Log LEVEL")
 	logger.Error().Str("Error", "ON").Msg("Log LEVEL")
 
-	fmt.Println("\n🔥 Igniting server on ws://" + ip + utils.PORT + "\n")
-	fmt.Println("🔥 webapp http://" + ip + utils.PORT + "\n")
+	fmt.Print(`──────────────────────────────────────────────────────────────
+
+`)
 
 	mux := http.NewServeMux()
 
