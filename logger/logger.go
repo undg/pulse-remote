@@ -2,62 +2,77 @@ package logger
 
 import (
 	"os"
-	"strconv"
+	"strings"
 	"time"
 
 	"github.com/rs/zerolog"
-	"github.com/undg/go-prapi/buildinfo"
 )
 
 var logger zerolog.Logger
 
-var (
-	// export these methods directly
-	Trace = logger.Trace // (most noise)
-	Debug = logger.Debug
-	Info  = logger.Info
-	Warn  = logger.Warn
-	Error = logger.Error
-	Fatal = logger.Fatal
-	Panic = logger.Panic
-)
-
 // logger based on zerolog
 func init() {
-	bi := buildinfo.Get()
 
-	debug := os.Getenv("DEBUG")
+	debug := strings.ToUpper(os.Getenv("DEBUG"))
 
-	isNumber := true
-	level, err := strconv.ParseInt(debug, 10, 64)
-	if err != nil {
-		isNumber = false
-	}
+	level := zerolog.InfoLevel
 
-	if isNumber && level >= 3 {
-		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-	}
-
+	// @TODO (undg) 2025-02-15: allows those numbers in DEBUG env var
+	//
+	// zerolog allows for logging at the following levels (from highest to lowest):
+	//
+	// panic (zerolog.PanicLevel, 5)
+	// fatal (zerolog.FatalLevel, 4)
+	// error (zerolog.ErrorLevel, 3)
+	// warn (zerolog.WarnLevel, 2)
+	// info (zerolog.InfoLevel, 1)
+	// debug (zerolog.DebugLevel, 0)
+	// trace (zerolog.TraceLevel, -1)
 	switch debug {
-	case "TRACE", "3":
-		zerolog.SetGlobalLevel(zerolog.TraceLevel)
-	case "DEBUG", "2":
-		zerolog.SetGlobalLevel(zerolog.DebugLevel)
-	case "INFO", "1":
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
-	case "WARN", "0":
-		zerolog.SetGlobalLevel(zerolog.WarnLevel)
-	case "ERR", "-1":
-		zerolog.SetGlobalLevel(zerolog.ErrorLevel)
+	case "TRACE":
+		level = zerolog.TraceLevel
+	case "DEBUG":
+		level = zerolog.DebugLevel
+	case "INFO":
+		level = zerolog.InfoLevel
+	case "WARN":
+		level = zerolog.WarnLevel
+	case "ERR":
+		level = zerolog.ErrorLevel
 	default:
-		zerolog.SetGlobalLevel(zerolog.InfoLevel)
+		level = zerolog.InfoLevel
+		debug = "DEFAULT"
 	}
 
-	logger = zerolog.New(zerolog.ConsoleWriter{Out: os.Stderr, TimeFormat: time.RFC3339}).
-		Level(zerolog.TraceLevel).
+	logger = zerolog.New(zerolog.ConsoleWriter{
+		Out:        os.Stderr,
+		TimeFormat: time.RFC3339,
+	}).
+		Level(level).
 		With().
 		Timestamp().
 		Caller().
-		Str("commit", bi.GitCommit).
 		Logger()
+
+	Trace = logger.Trace
+	Debug = logger.Debug
+	Info = logger.Info
+	Warn = logger.Warn
+	Error = logger.Error
+	Fatal = logger.Fatal
+	Panic = logger.Panic
+	GetLevel = logger.GetLevel
+	DebugEnv = debug
 }
+
+var (
+	Trace    func() *zerolog.Event
+	Debug    func() *zerolog.Event
+	Info     func() *zerolog.Event
+	Warn     func() *zerolog.Event
+	Error    func() *zerolog.Event
+	Fatal    func() *zerolog.Event
+	Panic    func() *zerolog.Event
+	GetLevel func() zerolog.Level
+	DebugEnv string
+)

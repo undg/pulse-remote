@@ -8,6 +8,7 @@ import (
 
 	"github.com/undg/go-prapi/buildinfo"
 	prapiJSON "github.com/undg/go-prapi/json"
+	"github.com/undg/go-prapi/logger"
 	"github.com/undg/go-prapi/utils"
 	"github.com/undg/go-prapi/ws"
 )
@@ -56,8 +57,15 @@ func main() {
   Compiler:   `, b.Compiler, `
   Platform:   `, b.Platform, `
   GoVersion:  `, b.GoVersion, `
+  LogLevel:   `, logger.GetLevel(), `
+  DEBUG:      `, logger.DebugEnv, `
 └───────────────────────────────────────────────────┘
 `)
+	logger.Trace().Str("Trace", "ON").Msg("Log LEVEL")
+	logger.Debug().Str("Debug", "ON").Msg("Log LEVEL")
+	logger.Info().Str("Info", "ON").Msg("Log LEVEL")
+	logger.Warn().Str("Warn", "ON").Msg("Log LEVEL")
+	logger.Error().Str("Error", "ON").Msg("Log LEVEL")
 
 	fmt.Println("\n🔥 Igniting server on ws://" + ip + utils.PORT + "\n")
 	fmt.Println("🔥 webapp http://" + ip + utils.PORT + "\n")
