@@ -2,13 +2,13 @@ package pactl
 
 import (
 	"bufio"
-	"log"
 	"os/exec"
 	"regexp"
 	"strconv"
 	"strings"
 
 	"github.com/undg/go-prapi/buildinfo"
+	"github.com/undg/go-prapi/logger"
 )
 
 func SetSinkVolume(sinkName string, volume string) {
@@ -194,17 +194,17 @@ func GetStatus() Status {
 
 	outputs, err := GetOutputs()
 	if err != nil {
-		log.Printf("%s GetOutputs(): %s", errPrefix, err)
+		logger.Error().Err(err).Msgf("%s GetOutputs()", errPrefix)
 	}
 
 	sources, err := GetSources()
 	if err != nil {
-		log.Printf("%s GetSources(): %s", errPrefix, err)
+		logger.Error().Err(err).Msgf("%s GetSources()", errPrefix)
 	}
 
 	apps, err := GetApps()
 	if err != nil {
-		log.Printf("%s GetApps(): %s", errPrefix, err)
+		logger.Error().Err(err).Msgf("%s GetApps()", errPrefix)
 	}
 
 	bi := buildinfo.Get()

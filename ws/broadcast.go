@@ -1,13 +1,12 @@
 package ws
 
 import (
-	"log"
 	"reflect"
 	"time"
 
 	"github.com/undg/go-prapi/json"
+	"github.com/undg/go-prapi/logger"
 	"github.com/undg/go-prapi/pactl"
-	"github.com/undg/go-prapi/utils"
 )
 
 var prevRes json.Response
@@ -24,10 +23,7 @@ func BroadcastUpdates() {
 		clientsMutex.Unlock()
 
 		if clientsCount == 0 {
-			if utils.DEBUG {
-				log.Println("No clients connected. Skipping VOLUME update.")
-			}
-
+			logger.Debug().Msg("No clients connected. Skip VOLUME update.")
 			continue
 		}
 
@@ -48,11 +44,14 @@ func BroadcastUpdates() {
 
 		clientsMutex.Lock()
 		updatedClients := 0
+
+		loggerMsg := "broadcasting volume status"
+
 		for conn := range clients {
 			conn.SetWriteDeadline(time.Now().Add(writeWait))
 			err := safeWriteJSON(conn, res)
 			if err != nil {
-				log.Printf("ERROR broadcast VOLUME update to client: %v\n", err)
+				logger.Error().Err(err).Msg(loggerMsg)
 				conn.Close()
 				delete(clients, conn)
 			} else {
@@ -61,6 +60,12 @@ func BroadcastUpdates() {
 		}
 		clientsMutex.Unlock()
 
-		log.Printf("Volume broadcast sent to %d/%d clients. Value: %v\n", updatedClients, clientsCount, res.Payload)
+		if res.Error != "" {
+			logger.Error().Str("Action", res.Action).Int("Status", int(res.Status)).Str("Error", string(res.Error)).Int("updated_clients", updatedClients).Msg(loggerMsg)
+		}
+
+		logger.Info().Str("Action", res.Action).Int("Status", int(res.Status)).Int("updated_clients", updatedClients).Msg(loggerMsg)
+		logger.Debug().Str("res.Payload", "DEBUG=TRACE to see Payload").Msg(loggerMsg)
+		logger.Trace().Interface("full_res", res).Msg(loggerMsg)
 	}
 }

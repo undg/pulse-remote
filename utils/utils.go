@@ -1,14 +1,12 @@
 package utils
 
 import (
-	"log"
 	"net"
 
 	"github.com/undg/go-prapi/json"
 )
 
 const PORT = ":8448"
-const DEBUG = false
 
 func ActionsToStrings(actions []json.Action) []string {
 	strs := make([]string, len(actions))
@@ -39,17 +37,18 @@ func IsLocalIP(ip net.IP) bool {
 	return false
 }
 
-func GetLocalIP() string {
+func GetLocalIP() (string, error) {
+
 	addrs, err := net.InterfaceAddrs()
 	if err != nil {
-		log.Fatal(err)
+		return "", err
 	}
 	for _, addr := range addrs {
 		if ipnet, ok := addr.(*net.IPNet); ok && !ipnet.IP.IsLoopback() {
 			if ipnet.IP.To4() != nil {
-				return ipnet.IP.String()
+				return ipnet.IP.String(), nil
 			}
 		}
 	}
-	return ""
+	return "", nil
 }

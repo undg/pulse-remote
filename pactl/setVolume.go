@@ -2,9 +2,10 @@ package pactl
 
 import (
 	"fmt"
-	"log"
 	"os/exec"
 	"strconv"
+
+	"github.com/undg/go-prapi/logger"
 )
 
 // setVolume adjusts volume state for PulseAudio devices.
@@ -14,13 +15,16 @@ import (
 //   - nameOrID: name for sinks/sources, numeric ID for inputs
 //   - volume: volume level
 func setVolume(kind string, nameOrID string, volume string) {
-	errPrefix := "ERROR [setVolume(" + kind + ", " + nameOrID + ", " + volume + ")]"
 	volumeInPercent := fmt.Sprint(volume) + "%"
 
 	cmd := exec.Command("pactl", "set-"+kind+"-volume", nameOrID, volumeInPercent)
+
+	logger.Debug().Msgf("$> pactl set-"+kind+"-volume %s %s", nameOrID, volumeInPercent)
+	logger.Info().Str("kind", kind).Str("nameOrID", nameOrID).Str("volumeInPercent", volumeInPercent).Msg("exec.Command(pactl ***) in setVolume()")
+
 	_, err := cmd.Output()
 	if err != nil {
-		log.Printf("%s $> pactl set-"+kind+"-volume"+nameOrID+" "+volumeInPercent+": %s\n", errPrefix, err)
+		logger.Error().Err(err).Msg("exec.Command(pactl ***) FAIL in setVolume()")
 	}
 }
 
@@ -32,13 +36,15 @@ func setVolume(kind string, nameOrID string, volume string) {
 //   - muted: muted state
 func setMuted(kind string, nameOrID string, muted bool) {
 	mutedStr := strconv.FormatBool(muted)
-	errPrefix := "ERROR [setMuted(" + kind + ", " + nameOrID + ", " + mutedStr + ")]"
 
 	cmd := exec.Command("pactl", "set-"+kind+"-mute", nameOrID, mutedStr)
 
+	logger.Debug().Msgf("$> pactl set-"+kind+"-mute %s %s", nameOrID, mutedStr)
+	logger.Info().Str("kind", kind).Str("nameOrID", nameOrID).Str("mutedStr", mutedStr).Msg("exec.Command(pactl ***) in setMuted()")
+
 	_, err := cmd.Output()
 	if err != nil {
-		log.Printf("%s $> pactl set-"+kind+"-mute "+nameOrID+" "+mutedStr+": %s\n", errPrefix, err)
+		logger.Error().Err(err).Msg("exec.Command(pactl ***) FAIL in setMuted()")
 	}
 }
 
@@ -49,11 +55,13 @@ func setMuted(kind string, nameOrID string, muted bool) {
 //   - appID: sink-input ID or source-output ID
 //   - deviceName: sink name or source name
 func moveApp(kind string, appID string, deviceName string) {
-	errPrefix := "ERROR [moveApp(" + kind + ", " + appID + ", " + deviceName + ")]"
-
 	cmd := exec.Command("pactl", "move-"+kind, appID, deviceName)
+
+	logger.Debug().Msgf("$> pactl move-"+kind+"-mute %s %s", appID, deviceName)
+	logger.Info().Str("kind", kind).Str("appID", appID).Str("deviceName", deviceName).Msg("exec.Command(pactl ***) in moveApp()")
+
 	_, err := cmd.Output()
 	if err != nil {
-		log.Printf("%s $> pactl move-"+kind+" "+appID+" "+deviceName+": %s\n", errPrefix, err)
+		logger.Error().Err(err).Msg("exec.Command(pactl ***) FAIL in moveApp()")
 	}
 }

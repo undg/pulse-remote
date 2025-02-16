@@ -1,12 +1,12 @@
 package ws
 
 import (
-	"log"
 	"net"
 	"net/http"
 	"strings"
 
 	"github.com/gorilla/websocket"
+	"github.com/undg/go-prapi/logger"
 	"github.com/undg/go-prapi/utils"
 )
 
@@ -16,24 +16,25 @@ var upgrader = websocket.Upgrader{
 }
 
 func upgraderCheckOrigin() {
-	errPrefix := "ERROR [upgraderCheckOrigin()]: "
+	msgPrefix := "ERROR [upgraderCheckOrigin()]: "
 	upgrader.CheckOrigin = func(r *http.Request) bool {
 		host, _, err := net.SplitHostPort(r.RemoteAddr)
 		if err != nil {
-			log.Printf("%s splitting host and port: %v\n", errPrefix, err)
+			logger.Error().Err(err).Msg("SplitHostPort")
 			return false
 		}
 
 		ip := net.ParseIP(host)
 		if ip == nil {
-			log.Printf("%s Can't parse IP: %s\n", errPrefix, host)
+			logger.Error().Err(err).Msg("ParseIP")
 			return false
 		}
 
 		if utils.IsLocalIP(ip) || strings.HasPrefix(r.Host, "localhost") {
+			logger.Info().Str("IP", string(ip)).Str("Host", r.Host).Msgf("ParseIP %s", msgPrefix)
 			return true
 		} else {
-			log.Printf("%s IP is not allowed: %s\n", errPrefix, host)
+			logger.Error().Str("IP", string(ip)).Str("Host", r.Host).Msgf("ParseIP %s", msgPrefix)
 			return false
 		}
 

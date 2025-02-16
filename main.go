@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 
@@ -44,7 +43,10 @@ func startServer(mux *http.ServeMux) {
 }
 
 func main() {
-	ip := utils.GetLocalIP()
+	ip, err := utils.GetLocalIP()
+	if err != nil {
+		logger.Error().Err(err).Msg("can't GetLocalIP()")
+	}
 	b := buildinfo.Get()
 
 	fmt.Print(`
@@ -82,8 +84,8 @@ func main() {
 
 	go ws.BroadcastUpdates()
 
-	err := http.ListenAndServe(utils.PORT, mux)
-	if err != nil {
-		log.Fatal("ERROR ", err)
+	errListenAndServe := http.ListenAndServe(utils.PORT, mux)
+	if errListenAndServe != nil {
+		logger.Fatal().Err(errListenAndServe).Msg("server failed to start")
 	}
 }

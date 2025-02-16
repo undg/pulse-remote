@@ -3,11 +3,11 @@ package json
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
 	"reflect"
 
 	"github.com/danielgtaylor/huma/schema"
+	"github.com/undg/go-prapi/logger"
 	"github.com/undg/go-prapi/pactl"
 )
 
@@ -16,13 +16,13 @@ func serveSchemaJSON(w http.ResponseWriter, t reflect.Type) {
 
 	s, err := schema.Generate(t)
 	if err != nil {
-		log.Println("ERROR ", err)
+		logger.Error().Err(err).Msg("Schema error")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 
 	b, err := json.Marshal(s)
 	if err != nil {
-		log.Println("ERROR ", err)
+		logger.Error().Err(err).Msg("Internal Server Error")
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 	}
 
@@ -34,6 +34,7 @@ func serveRestJSON(w http.ResponseWriter, restJSON interface{}) {
 	w.Header().Set("Content-Type", "application/json")
 
 	if err := json.NewEncoder(w).Encode(restJSON); err != nil {
+		logger.Error().Err(err).Msg("json.NewEncoder(w).Encode(restJSON)")
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}

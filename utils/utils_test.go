@@ -4,6 +4,8 @@ import (
 	"net"
 	"regexp"
 	"testing"
+
+	"github.com/undg/go-prapi/logger"
 )
 
 func TestIsLocalIP(t *testing.T) {
@@ -55,9 +57,10 @@ func TestIsLocalIP(t *testing.T) {
 }
 
 func TestGetLocalIP(t *testing.T) {
-	ip := GetLocalIP()
-	if ip == "" {
-		t.Error("No IP found")
+	ip, err := GetLocalIP()
+
+	if err != nil {
+		logger.Error().Err(err).Msg("problem with GetLocalIP()")
 	}
 
 	ipPattern := `^(\d{1,3}\.){3}\d{1,3}$`

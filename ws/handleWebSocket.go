@@ -1,13 +1,13 @@
 package ws
 
 import (
-	"log"
 	"net/http"
 	"strings"
 	"sync"
 
 	"github.com/gorilla/websocket"
 	"github.com/undg/go-prapi/json"
+	"github.com/undg/go-prapi/logger"
 	"github.com/undg/go-prapi/pactl"
 	"github.com/undg/go-prapi/utils"
 )
@@ -16,13 +16,13 @@ var clients = make(map[*websocket.Conn]bool)
 var clientsMutex = &sync.Mutex{}
 
 func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
-	log.Printf("wsEndpoint visited by: %s %s\n", r.Host, r.RemoteAddr)
+	logger.Info().Str("server_ip", r.Host).Str("client_ip", r.RemoteAddr).Msg("New client attempting to connect")
 
 	upgraderCheckOrigin()
 
 	conn, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Printf("ERROR upgrading to WebSocket: %v\n", err)
+		logger.Error().Err(err).Msg("Upgrading Websocket unsuccessful")
 		return
 	}
 
@@ -31,7 +31,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	clientCount := len(clients)
 	clientsMutex.Unlock()
 
-	log.Printf("New client connected. Total clients: %d\n", clientCount)
+	logger.Info().Int("clients_connected", clientCount).Msg("Client connection established")
 
 	// Execute ActionGetStatus when a new client connects
 	status := pactl.GetStatus()
@@ -43,17 +43,17 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := safeWriteJSON(conn, initialResponse); err != nil {
-		log.Printf("ERROR sending initial sinks data: %v\n", err)
+		logger.Error().Err(err).Msg("Initial sinks data FAIL")
 	}
 
 	// Cleanup after client is disconnected
 	defer func() {
 		clientsMutex.Lock()
 		delete(clients, conn)
-		clientCount := len(clients)
+		clientCounts := len(clients)
 		clientsMutex.Unlock()
 		conn.Close()
-		log.Printf("Client disconnected. Total clients: %d\n", clientCount)
+		logger.Info().Int("clients_count", clientCounts).Msg("Client disconnected")
 	}()
 
 	// Messaging system with client
@@ -62,7 +62,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		err := conn.ReadJSON(&msg)
 		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Printf("ERROR reading JSON: %v\n", err)
+				logger.Error().Err(err).Msg("Can't read JSON")
 			}
 			break
 		}
@@ -116,7 +116,7 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 		handleServerLog(&msg, &res)
 
 		if err := safeWriteJSON(conn, res); err != nil {
-			log.Printf("ERROR writing JSON: %v\n", err)
+			logger.Error().Err(err).Msg("Can't write JSON")
 			break
 		}
 	}
