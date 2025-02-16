@@ -17,8 +17,6 @@ func init() {
 
 	level := zerolog.InfoLevel
 
-	// @TODO (undg) 2025-02-15: allows those numbers in DEBUG env var
-	//
 	// zerolog allows for logging at the following levels (from highest to lowest):
 	//
 	// panic (zerolog.PanicLevel, 5)
@@ -29,19 +27,23 @@ func init() {
 	// debug (zerolog.DebugLevel, 0)
 	// trace (zerolog.TraceLevel, -1)
 	switch debug {
-	case "TRACE":
+	case "TRACE", "-1":
 		level = zerolog.TraceLevel
-	case "DEBUG":
+	case "DEBUG", "0":
 		level = zerolog.DebugLevel
-	case "INFO":
+	case "INFO", "1":
 		level = zerolog.InfoLevel
-	case "WARN":
+	case "WARN", "2":
 		level = zerolog.WarnLevel
-	case "ERR":
+	case "ERR", "3":
 		level = zerolog.ErrorLevel
+	case "FATAL", "4":
+		level = zerolog.FatalLevel
+	case "PANIC", "5":
+		level = zerolog.PanicLevel
 	default:
 		level = zerolog.InfoLevel
-		debug = "DEFAULT"
+		debug = "INFO"
 	}
 
 	logger = zerolog.New(zerolog.ConsoleWriter{
