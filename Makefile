@@ -194,24 +194,22 @@ run/watch:
 # INSTALL
 # ==================================================================================== #
 
-# @TODO (undg) 2025-02-17: dirty sudo. TMP solution
 .PHONY: install
 install:
 	make build
 	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
 	sudo cp build/bin/${BINARY_NAME} /usr/bin/${BINARY_NAME}
-	sudo cp ${SERVICE_NAME} /etc/systemd/user/${SERVICE_NAME}
+	sudo cp ${SERVICE_NAME} /usr/lib/systemd/user/${SERVICE_NAME}
 	sudo systemctl daemon-reload
 	systemctl --user enable pulse-remote
 	systemctl --user start pulse-remote
 
-# @TODO (undg) 2025-02-17: dirty sudo. TMP solution
 .PHONY: uninstall
 uninstall:
 	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
 	systemctl --user disable ${SERVICE_NAME} 
 	sudo rm /usr/bin/${BINARY_NAME}
-	sudo rm /etc/systemd/user/${SERVICE_NAME}
+	sudo rm /usr/lib/systemd/user/${SERVICE_NAME}
 	systemctl --user daemon-reload
 
 
