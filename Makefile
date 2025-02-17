@@ -90,31 +90,42 @@ test/cover:
 	go test -v -race -buildvcs -coverprofile=/tmp/coverage.out ./...
 	go tool cover -html=/tmp/coverage.out
 
-## build: get latest frontend from github and build in /tmp/bin/pr-web/dist
+## build: get latest frontend from github and build in build/pr-web/dist
 .PHONY: build/fe
 build/fe:
-	rm -rf /tmp/bin/pr-web
-	git clone "https://github.com/undg/pr-web" /tmp/bin/pr-web
-	cd /tmp/bin/pr-web && \
+	rm -rf build/pr-web
+	git clone "https://github.com/undg/pr-web" build/pr-web
+	cd build/pr-web && \
 	pnpm install && \
 	pnpm build
 
 ## build: build the application
-.PHONY: build
-build: 
+.PHONY: build/be
+build/be: 
 	# Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
-	go build -ldflags=${LDFLAGS} -o=/tmp/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
+	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
 ## build: build the application together with frontend
-.PHONY: build/full
-build/full:
+.PHONY: build
+build:
 	make build/fe
-	make build
+	make build/be
+
+## build: build the application together with frontend
+.PHONY: build/clear
+build/clear:
+	rm -rf build/
 
 ## run: build and run the application
 .PHONY: run
-run: build
-	while true; do /tmp/bin/${BINARY_NAME};sleep 1; done
+run:
+	make build
+	while true; do build/bin/${BINARY_NAME};sleep 1; done
+
+.PHONY: run/be
+run/be:
+	make build/be
+	while true; do build/bin/${BINARY_NAME};sleep 1; done
 
 ## run: build/full and run the application
 .PHONY: run/full

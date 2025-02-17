@@ -1,9 +1,9 @@
 package main
 
 import (
+	"embed"
 	"fmt"
 	"net/http"
-	"os"
 
 	"github.com/undg/go-prapi/buildinfo"
 	prapiJSON "github.com/undg/go-prapi/json"
@@ -13,6 +13,12 @@ import (
 )
 
 // @TODO (undg) 2024-10-06: different port for dev and production
+
+//go:embed build/pr-web/dist/*
+//go:embed build/pr-web/dist/assets/*
+//go:embed build/pr-web/dist/fonts/*
+//go:embed build/pr-web/dist/icons/*
+var prWebDist embed.FS
 
 func startServer(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
@@ -32,13 +38,12 @@ func startServer(mux *http.ServeMux) {
 		}
 	})
 
-	fs := http.FileServer(http.Dir("/tmp/bin/pr-web/dist"))
+	// Static files
+	fsys := http.FileServer(http.FS(prWebDist))
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, err := os.Stat("/tmp/bin/pr-web/dist" + r.URL.Path); os.IsNotExist(err) {
-			http.ServeFile(w, r, "/tmp/bin/pr-web/dist/index.html")
-		} else {
-			fs.ServeHTTP(w, r)
-		}
+		// Rewrite request path to include dist directory
+		r.URL.Path = "/build/pr-web/dist" + r.URL.Path
+		fsys.ServeHTTP(w, r)
 	}))
 }
 
