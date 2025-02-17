@@ -78,10 +78,30 @@ logger.Error().Msg("from logger.Error")
 logger.Fatal().Msg("from logger.Fatal")
 logger.Panic().Msg("from logger.Panic")
 
+# CLI snippets
+
+Few useful commands
+
+@TODO (undg) 2025-02-17: clean doc
+
+```bash
+make install
+
+make uninstall
+
+systemctl --user start pulse-remote.service
+
+systemctl --user set-environment DEBUG=trace # see available options in Debugging section
+
+systemctl --user restart pulse-remote.service
+
+systemctl --user unset-environment DEBUG
+
+journalctl --user -u pulse-remote.service -f --output cat
+
+```
+
 ## License
 
 This project is licensed under the GNU General Public License v2.0.
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.

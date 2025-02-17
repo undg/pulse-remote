@@ -198,7 +198,7 @@ run/watch:
 .PHONY: install
 install:
 	make build
-	# systemctl --user stop ${SERVICE_NAME} 
+	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
 	sudo cp build/bin/${BINARY_NAME} /usr/bin/${BINARY_NAME}
 	sudo cp ${SERVICE_NAME} /etc/systemd/user/${SERVICE_NAME}
 	sudo systemctl daemon-reload
@@ -208,10 +208,10 @@ install:
 # @TODO (undg) 2025-02-17: dirty sudo. TMP solution
 .PHONY: uninstall
 uninstall:
-	sudo systemctl stop ${SERVICE_NAME} 
-	sudo systemctl disable ${SERVICE_NAME} 
+	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
+	systemctl --user disable ${SERVICE_NAME} 
 	sudo rm /usr/bin/${BINARY_NAME}
 	sudo rm /etc/systemd/user/${SERVICE_NAME}
-	sudo systemctl daemon-reload
+	systemctl --user daemon-reload
 
 
