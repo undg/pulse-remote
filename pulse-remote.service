@@ -4,6 +4,7 @@ After=network.target pulseaudio.service
 
 [Service]
 Type=simple
+User=%i
 Restart=always
 RestartSec=1
 ExecStart=/usr/bin/pulse-remote-server
