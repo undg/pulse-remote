@@ -3,6 +3,7 @@ package main
 import (
 	"embed"
 	"fmt"
+	"io"
 	"net/http"
 
 	"github.com/undg/go-prapi/buildinfo"
@@ -41,10 +42,20 @@ func startServer(mux *http.ServeMux) {
 	// Static files
 	fsys := http.FileServer(http.FS(prWebDist))
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		// Rewrite request path to include dist directory
-		r.URL.Path = "/build/pr-web/dist" + r.URL.Path
+		path := "build/pr-web/dist" + r.URL.Path
+		_, err := prWebDist.Open(path)
+		if err != nil {
+			// File not exist, serve index.html
+			w.Header().Set("Content-Type", "text/html")
+			indexFile, _ := prWebDist.Open("build/pr-web/dist/index.html")
+			io.Copy(w, indexFile)
+			return
+		}
+		// File exists, serve it
+		r.URL.Path = path
 		fsys.ServeHTTP(w, r)
 	}))
+
 }
 
 func main() {
