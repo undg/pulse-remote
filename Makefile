@@ -105,16 +105,17 @@ build/be:
 	# Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
 	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
-## build: build the application together with frontend
-.PHONY: build
-build:
-	make build/fe
-	make build/be
-
-## build: build the application together with frontend
+## build: remove build/ directory for fresh start
 .PHONY: build/clear
 build/clear:
 	rm -rf build/
+
+## build: build the application together with frontend
+.PHONY: build
+build:
+	make build/clear
+	make build/fe
+	make build/be
 
 ## run: build and run the application
 .PHONY: run
@@ -122,6 +123,7 @@ run:
 	make build
 	while true; do build/bin/${BINARY_NAME};sleep 1; done
 
+## run: build only BE and run the application
 .PHONY: run/be
 run/be:
 	make build/be
@@ -136,7 +138,7 @@ run/full: build/full
 .PHONY: run/watch
 run/watch:
 	go run github.com/cosmtrek/air@v1.43.0 \
-		--build.cmd "make build" --build.bin "/tmp/bin/${BINARY_NAME}" --build.delay "100" \
+		--build.cmd "make build" --build.bin "build/bin/${BINARY_NAME}" --build.delay "100" \
 		--build.exclude_dir "" \
 		--build.include_ext "go, tpl, tmpl, html, css, scss, js, ts, sql, jpeg, jpg, gif, png, bmp, svg, webp, ico" \
 		--misc.clean_on_exit "true"
@@ -183,10 +185,3 @@ bump/minor:
 bump/main:
 	./scripts/bump.sh main
 
-## production/deploy: deploy the application to production
-.PHONY: production/deploy
-production/deploy: confirm tidy audit no-dirty
-	GOOS=linux GOARCH=amd64 go build -ldflags='-s' -o=/tmp/bin/linux_amd64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	upx -5 /tmp/bin/linux_amd64/${BINARY_NAME}
-	# Include additional deployment steps here...
-	
