@@ -1,6 +1,7 @@
 # Change these variables as necessary.
 MAIN_PACKAGE_PATH := .
-BINARY_NAME := prapi
+BINARY_NAME := pulse-remote-server
+SERVICE_NAME := pulse-remote.service
 
 BUILD_TIME=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 GIT_COMMIT=$(shell git rev-parse --short=7 HEAD)
@@ -90,6 +91,51 @@ test/cover:
 	go test -v -race -buildvcs -coverprofile=/tmp/coverage.out ./...
 	go tool cover -html=/tmp/coverage.out
 
+# ==================================================================================== #
+# UTILS
+# ==================================================================================== #
+
+.PHONY: sink-type
+sink-type:
+	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
+	$(call generate_pactl_type,list sinks,sink)
+
+sink-item-type:
+	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
+	# ffplay -nodisp -autoexit -f lavfi -i "anullsrc=r=44100:cl=stereo" -loglevel quiet &
+	$(call generate_pactl_type,list sink-inputs,apps)
+	# killall ffplay
+
+.PHONY source-type:
+source-type:
+	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
+	$(call generate_pactl_type,list sources,source)
+
+## typesgen: generate structs from json output
+.PHONY: typesgen
+typesgen: sink-type source-type tidy
+
+## push: push changes to the remote Git repository
+.PHONY: push
+push: tidy audit no-dirty
+	git push
+
+.PHONY: bump/patch
+bump/patch:
+	./scripts/bump.sh patch
+
+.PHONY: bump/minor
+bump/minor:
+	./scripts/bump.sh minor
+
+.PHONY: bump/main
+bump/main:
+	./scripts/bump.sh main
+
+# ==================================================================================== #
+# BUILD
+# ==================================================================================== #
+
 ## build: get latest frontend from github and build in build/pr-web/dist
 .PHONY: build/fe
 build/fe:
@@ -145,43 +191,27 @@ run/watch:
 
 
 # ==================================================================================== #
-# OPERATIONS
+# INSTALL
 # ==================================================================================== #
 
-.PHONY: sink-type
-sink-type:
-	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
-	$(call generate_pactl_type,list sinks,sink)
+# @TODO (undg) 2025-02-17: dirty sudo. TMP solution
+.PHONY: install
+install:
+	make build
+	# systemctl --user stop ${SERVICE_NAME} 
+	sudo cp build/bin/${BINARY_NAME} /usr/bin/${BINARY_NAME}
+	sudo cp ${SERVICE_NAME} /etc/systemd/user/${SERVICE_NAME}
+	sudo systemctl daemon-reload
+	systemctl --user enable pulse-remote
+	systemctl --user start pulse-remote
 
-sink-item-type:
-	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
-	# ffplay -nodisp -autoexit -f lavfi -i "anullsrc=r=44100:cl=stereo" -loglevel quiet &
-	$(call generate_pactl_type,list sink-inputs,apps)
-	# killall ffplay
+# @TODO (undg) 2025-02-17: dirty sudo. TMP solution
+.PHONY: uninstall
+uninstall:
+	sudo systemctl stop ${SERVICE_NAME} 
+	sudo systemctl disable ${SERVICE_NAME} 
+	sudo rm /usr/bin/${BINARY_NAME}
+	sudo rm /etc/systemd/user/${SERVICE_NAME}
+	sudo systemctl daemon-reload
 
-.PHONY source-type:
-source-type:
-	go install github.com/twpayne/go-jsonstruct/v3/cmd/gojsonstruct@latest
-	$(call generate_pactl_type,list sources,source)
-
-## typesgen: generate structs from json output
-.PHONY: typesgen
-typesgen: sink-type source-type tidy
-
-## push: push changes to the remote Git repository
-.PHONY: push
-push: tidy audit no-dirty
-	git push
-
-.PHONY: bump/patch
-bump/patch:
-	./scripts/bump.sh patch
-
-.PHONY: bump/minor
-bump/minor:
-	./scripts/bump.sh minor
-
-.PHONY: bump/main
-bump/main:
-	./scripts/bump.sh main
 

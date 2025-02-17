@@ -1,0 +1,12 @@
+[Unit]
+Description=pulse remote server and web app
+After=network.target pulseaudio.service
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+ExecStart=/usr/bin/pulse-remote-server
+
+[Install]
+WantedBy=default.target
