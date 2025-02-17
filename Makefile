@@ -143,12 +143,13 @@ build/fe:
 	git clone "https://github.com/undg/pr-web" build/pr-web
 	cd build/pr-web && \
 	pnpm install && \
+	pnpm test:ci && \
 	pnpm build
 
 ## build/be: build the application
 .PHONY: build/be
 build/be: 
-	# Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
+	make test
 	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
 ## build/clear: remove build/ directory for fresh start
