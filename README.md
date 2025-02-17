@@ -101,7 +101,3 @@ journalctl --user -u pulse-remote.service -f --output cat
 
 ```
 
-## License
-
-This project is licensed under the GNU General Public License v2.0.
-

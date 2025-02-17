@@ -136,7 +136,7 @@ bump/main:
 # BUILD
 # ==================================================================================== #
 
-## build: get latest frontend from github and build in build/pr-web/dist
+## build/fe: get latest frontend from github and build in build/pr-web/dist
 .PHONY: build/fe
 build/fe:
 	rm -rf build/pr-web
@@ -145,13 +145,13 @@ build/fe:
 	pnpm install && \
 	pnpm build
 
-## build: build the application
+## build/be: build the application
 .PHONY: build/be
 build/be: 
 	# Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
 	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
-## build: remove build/ directory for fresh start
+## build/clear: remove build/ directory for fresh start
 .PHONY: build/clear
 build/clear:
 	rm -rf build/
