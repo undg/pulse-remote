@@ -60,7 +60,8 @@ tidy:
 
 .PHONY: tidy/ci
 tidy/ci:
-	tidy no-dirty
+	make tidy
+	make no-dirty
 
 ## audit: run quality control checks
 .PHONY: audit/ci
@@ -71,7 +72,10 @@ audit/ci:
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
 .PHONY: audit
-audit/full: tidy audit/ci test
+audit/full:
+	make tidy
+	make audit/ci 
+	make test
 
 # ==================================================================================== #
 # DEVELOPMENT
