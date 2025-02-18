@@ -141,17 +141,17 @@ bump/main:
 # BUILD
 # ==================================================================================== #
 
-## update/web: get latest frontend from github and build in build/pr-web/dist
+## update/web: get latest frontend from github and build in web/dist
 .PHONY: update/web 
 update/web:
-
-
+	## get latest frontend from github and build in web/dist
 	rm -rf /tmp/build/pr-web
 	mkdir -p /tmp/build/pr-web
 	git clone "https://github.com/undg/pr-web" /tmp/build/pr-web
 
 	cd /tmp/build/pr-web/ && \
 	pnpm install && \
+	pnpm test:ci && \
 	pnpm build
 
 	cd -
@@ -172,22 +172,10 @@ update/web:
 
 
 ## build/be: build the application
-.PHONY: build/be
-build/be: 
-	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-
-## build/clear: remove build/ directory for fresh start
-.PHONY: build/clear
-build/clear:
-	# Delete build folder
-	rm -rf build/
-
-## build: build the application together with frontend
 .PHONY: build
-build:
-	make build/clear
-	make build/fe
-	make build/be
+build: 
+	rm -rf build/bin
+	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
 ## run: build and run the application
 .PHONY: run
