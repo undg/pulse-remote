@@ -71,8 +71,7 @@ audit/ci:
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
 .PHONY: audit
-audit/full:
-	tidy audit/ci test
+audit/full: tidy audit/ci test
 
 # ==================================================================================== #
 # DEVELOPMENT
