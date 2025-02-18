@@ -7,13 +7,15 @@ import (
 	"net/http"
 
 	"github.com/undg/go-prapi/api/buildinfo"
-	prapiJSON "github.com/undg/go-prapi/api/json"
+	prJSON "github.com/undg/go-prapi/api/json"
 	"github.com/undg/go-prapi/api/logger"
 	"github.com/undg/go-prapi/api/utils"
 	"github.com/undg/go-prapi/api/ws"
 )
 
-// @TODO (undg) 2024-10-06: different port for dev and production
+// @TODO (undg) 2024-10-06: different port in config, env var or cli flag
+
+const webDist = "web/dist"
 
 //go:embed web/dist/*
 //go:embed web/dist/assets/*
@@ -25,13 +27,13 @@ func startServer(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/v1/schema/status":
-			prapiJSON.ServeStatusSchemaJSON(w, r)
+			prJSON.ServeStatusSchemaJSON(w, r)
 		case "/api/v1/schema/message":
-			prapiJSON.ServeMessageSchemaJSON(w, r)
+			prJSON.ServeMessageSchemaJSON(w, r)
 		case "/api/v1/schema/response":
-			prapiJSON.ServeResponseSchemaJSON(w, r)
+			prJSON.ServeResponseSchemaJSON(w, r)
 		case "/api/v1/status":
-			prapiJSON.ServeStatusRestJSON(w, r)
+			prJSON.ServeStatusRestJSON(w, r)
 		case "/api/v1/ws":
 			ws.HandleWebSocket(w, r)
 		default:
@@ -42,12 +44,12 @@ func startServer(mux *http.ServeMux) {
 	// Static files
 	fsys := http.FileServer(http.FS(prWebDist))
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		path := "build/pr-web/dist" + r.URL.Path
+		path := webDist + r.URL.Path
 		_, err := prWebDist.Open(path)
 		if err != nil {
 			// File not exist, serve index.html
 			w.Header().Set("Content-Type", "text/html")
-			indexFile, _ := prWebDist.Open("build/pr-web/dist/index.html")
+			indexFile, _ := prWebDist.Open(webDist + "/index.html")
 			io.Copy(w, indexFile)
 			return
 		}
