@@ -15,10 +15,10 @@ import (
 
 // @TODO (undg) 2024-10-06: different port for dev and production
 
-//go:embed build/web/*
-//go:embed build/web/assets/*
-//go:embed build/web/fonts/*
-//go:embed build/web/icons/*
+//go:embed web/dist/*
+//go:embed web/dist/assets/*
+//go:embed web/dist/fonts/*
+//go:embed web/dist/icons/*
 var prWebDist embed.FS
 
 func startServer(mux *http.ServeMux) {

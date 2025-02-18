@@ -141,17 +141,35 @@ bump/main:
 # BUILD
 # ==================================================================================== #
 
-## build/fe: get latest frontend from github and build in build/pr-web/dist
-.PHONY: build/fe
-build/fe:
-	mkdir -p build
+## update/web: get latest frontend from github and build in build/pr-web/dist
+.PHONY: update/web 
+update/web:
 
-	# cd web/ && \
-	# pnpm install && \
-	# pnpm build
-	# cd -
 
-	cp -r web/dist build/web
+	rm -rf /tmp/build/pr-web
+	mkdir -p /tmp/build/pr-web
+	git clone "https://github.com/undg/pr-web" /tmp/build/pr-web
+
+	cd /tmp/build/pr-web/ && \
+	pnpm install && \
+	pnpm build
+
+	cd -
+
+	# pr-web current version:
+	cat web/version
+
+	git  -C /tmp/build/pr-web describe --long --abbrev=7 --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' > web/version
+
+	cp -r /tmp/build/pr-web/dist web
+
+	git reset
+	git add web
+	git commit -m "Update web to version $$(cat web/version)"
+
+	## pr-web latest version:
+	cat web/version
+
 
 ## build/be: build the application
 .PHONY: build/be
