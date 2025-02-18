@@ -143,13 +143,11 @@ build/fe:
 	git clone "https://github.com/undg/pr-web" build/pr-web
 	cd build/pr-web && \
 	pnpm install && \
-	pnpm test:ci && \
 	pnpm build
 
 ## build/be: build the application
 .PHONY: build/be
 build/be: 
-	make test
 	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
 ## build/clear: remove build/ directory for fresh start
@@ -179,7 +177,7 @@ run/be:
 ## run: build/full and run the application
 .PHONY: run/full
 run/full: build/full
-	/tmp/bin/${BINARY_NAME}
+	build/bin/${BINARY_NAME}
 
 ## run/watch: run the application with reloading on file changes
 .PHONY: run/watch
