@@ -1,6 +1,6 @@
 package pactl
 
-import "github.com/undg/go-prapi/buildinfo"
+import "github.com/undg/go-prapi/api/buildinfo"
 
 type Status = struct {
 	Outputs   []Output            `json:"outputs" doc:"List of output devices"`

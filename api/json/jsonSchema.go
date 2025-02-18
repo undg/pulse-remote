@@ -7,8 +7,8 @@ import (
 	"reflect"
 
 	"github.com/danielgtaylor/huma/schema"
-	"github.com/undg/go-prapi/logger"
-	"github.com/undg/go-prapi/pactl"
+	"github.com/undg/go-prapi/api/logger"
+	"github.com/undg/go-prapi/api/pactl"
 )
 
 func serveSchemaJSON(w http.ResponseWriter, t reflect.Type) {

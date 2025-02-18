@@ -1,6 +1,7 @@
 # Change these variables as necessary.
 MAIN_PACKAGE_PATH := .
 BINARY_NAME := pulse-remote-server
+PKG_NAME := pulse-remote
 SERVICE_NAME := pulse-remote.service
 
 BUILD_TIME=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
@@ -58,7 +59,8 @@ tidy:
 	go mod tidy -v
 
 .PHONY: tidy/ci
-tidy/ci: tidy no-dirty
+tidy/ci:
+	tidy no-dirty
 
 ## audit: run quality control checks
 .PHONY: audit/ci
@@ -69,7 +71,8 @@ audit/ci:
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
 .PHONY: audit
-audit/full: tidy audit/ci test
+audit/full:
+	tidy audit/ci test
 
 # ==================================================================================== #
 # DEVELOPMENT
@@ -113,11 +116,13 @@ source-type:
 
 ## typesgen: generate structs from json output
 .PHONY: typesgen
-typesgen: sink-type source-type tidy
+typesgen:
+	sink-type source-type tidy
 
 ## push: push changes to the remote Git repository
 .PHONY: push
-push: tidy audit no-dirty
+push:
+	tidy audit no-dirty
 	git push
 
 .PHONY: bump/patch
@@ -139,11 +144,14 @@ bump/main:
 ## build/fe: get latest frontend from github and build in build/pr-web/dist
 .PHONY: build/fe
 build/fe:
-	rm -rf build/pr-web
-	git clone "https://github.com/undg/pr-web" build/pr-web
-	cd build/pr-web && \
-	pnpm install && \
-	pnpm build
+	mkdir -p build
+
+	# cd web/ && \
+	# pnpm install && \
+	# pnpm build
+	# cd -
+
+	cp -r web/dist build/web
 
 ## build/be: build the application
 .PHONY: build/be
@@ -153,6 +161,7 @@ build/be:
 ## build/clear: remove build/ directory for fresh start
 .PHONY: build/clear
 build/clear:
+	# Delete build folder
 	rm -rf build/
 
 ## build: build the application together with frontend
@@ -167,17 +176,6 @@ build:
 run:
 	make build
 	while true; do build/bin/${BINARY_NAME};sleep 1; done
-
-## run: build only BE and run the application
-.PHONY: run/be
-run/be:
-	make build/be
-	while true; do build/bin/${BINARY_NAME};sleep 1; done
-
-## run: build/full and run the application
-.PHONY: run/full
-run/full: build/full
-	build/bin/${BINARY_NAME}
 
 ## run/watch: run the application with reloading on file changes
 .PHONY: run/watch
@@ -195,11 +193,17 @@ run/watch:
 
 .PHONY: install
 install:
+
 	make build
 	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
-	sudo cp build/bin/${BINARY_NAME} /usr/bin/${BINARY_NAME}
-	sudo cp ${SERVICE_NAME} /usr/lib/systemd/user/${SERVICE_NAME}
+
+	sudo install -Dm755 build/bin/${BINARY_NAME} /usr/bin/${BINARY_NAME}
+	sudo install -Dm644 ${SERVICE_NAME} /usr/lib/systemd/user/${SERVICE_NAME}
+	sudo install -Dm644 "LICENSE" "/usr/share/licenses/${PKG_NAME}/LICENSE"
+	sudo install -Dm644 "pulse-remote.1" "/usr/share/man/man1/pulse-remote.1"
+
 	sudo systemctl daemon-reload
+
 	systemctl --user enable pulse-remote
 	systemctl --user start pulse-remote
 
@@ -207,8 +211,12 @@ install:
 uninstall:
 	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
 	systemctl --user disable ${SERVICE_NAME} 
+
 	sudo rm /usr/bin/${BINARY_NAME}
 	sudo rm /usr/lib/systemd/user/${SERVICE_NAME}
+	sudo rm /usr/share/licenses/${PKG_NAME}/LICENSE
+	sudo rm /usr/share/man/man1/pulse-remote.1
+
 	systemctl --user daemon-reload
 
 

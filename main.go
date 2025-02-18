@@ -6,19 +6,19 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/undg/go-prapi/buildinfo"
-	prapiJSON "github.com/undg/go-prapi/json"
-	"github.com/undg/go-prapi/logger"
-	"github.com/undg/go-prapi/utils"
-	"github.com/undg/go-prapi/ws"
+	"github.com/undg/go-prapi/api/buildinfo"
+	prapiJSON "github.com/undg/go-prapi/api/json"
+	"github.com/undg/go-prapi/api/logger"
+	"github.com/undg/go-prapi/api/utils"
+	"github.com/undg/go-prapi/api/ws"
 )
 
 // @TODO (undg) 2024-10-06: different port for dev and production
 
-//go:embed build/pr-web/dist/*
-//go:embed build/pr-web/dist/assets/*
-//go:embed build/pr-web/dist/fonts/*
-//go:embed build/pr-web/dist/icons/*
+//go:embed build/web/*
+//go:embed build/web/assets/*
+//go:embed build/web/fonts/*
+//go:embed build/web/icons/*
 var prWebDist embed.FS
 
 func startServer(mux *http.ServeMux) {

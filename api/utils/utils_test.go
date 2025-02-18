@@ -5,7 +5,7 @@ import (
 	"regexp"
 	"testing"
 
-	"github.com/undg/go-prapi/logger"
+	"github.com/undg/go-prapi/api/logger"
 )
 
 func TestIsLocalIP(t *testing.T) {

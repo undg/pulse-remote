@@ -3,7 +3,7 @@ package utils
 import (
 	"net"
 
-	"github.com/undg/go-prapi/json"
+	"github.com/undg/go-prapi/api/json"
 )
 
 const PORT = ":8448"
