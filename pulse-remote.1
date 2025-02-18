@@ -1,0 +1,29 @@
+.TH PULSE-REMOTE 1 "2024" "pulse-remote" "User Commands"
+.SH NAME
+pulse-remote \- Remote audio control for PulseAudio/PipeWire
+.SH SYNOPSIS
+.B pulse-remote-server
+.SH DESCRIPTION
+Pulse Remote provides web interface to control audio volume on Linux systems running PulseAudio or PipeWire.
+.SH USAGE
+.PP
+Enable and start service:
+.PP
+.nf
+.RS 4
+systemctl --user enable pulse-remote.service
+systemctl --user start pulse-remote.service
+.fi
+.RE
+.PP
+Then open web interface:
+.PP
+.RS 4
+http://localhost:8448
+.RE
+.SH AUTHOR
+Written by Bartek Laskowski <bartek@undg.dev>
+.SH BUGS
+Report bugs at: https://github.com/undg/pulse-remote/issues
+.SH COPYRIGHT
+Copyright \(co 2024 Bartek Laskowski. MIT License.
