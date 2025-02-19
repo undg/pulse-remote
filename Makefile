@@ -72,7 +72,7 @@ audit/ci:
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
 .PHONY: audit
-audit/full:
+audit:
 	make tidy
 	make audit/ci 
 	make test
