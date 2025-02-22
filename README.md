@@ -1,4 +1,4 @@
-# go-prapi
+# pulse-remote
 
 ![test Pipewire](https://github.com/undg/go-prapi/actions/workflows/test-pipewire.yml/badge.svg)
 ![test PulseAudio](https://github.com/undg/go-prapi/actions/workflows/test-pulseaudio.yml/badge.svg)
