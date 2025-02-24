@@ -3,6 +3,7 @@ MAIN_PACKAGE_PATH := .
 BINARY_NAME := pulse-remote-server
 PKG_NAME := pulse-remote
 SERVICE_NAME := pulse-remote.service
+MAN_NAME := pulse-remote.1
 
 BUILD_TIME=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 GIT_COMMIT=$(shell git rev-parse --short=7 HEAD)
@@ -207,9 +208,9 @@ install:
 	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
 
 	sudo install -Dm755 build/bin/${BINARY_NAME} /usr/bin/${BINARY_NAME}
-	sudo install -Dm644 ${SERVICE_NAME} /usr/lib/systemd/user/${SERVICE_NAME}
+	sudo install -Dm644 os/${SERVICE_NAME} /usr/lib/systemd/user/${SERVICE_NAME}
 	sudo install -Dm644 "LICENSE" "/usr/share/licenses/${PKG_NAME}/LICENSE"
-	sudo install -Dm644 "pulse-remote.1" "/usr/share/man/man1/pulse-remote.1"
+	sudo install -Dm644 os/${MAN_NAME} "/usr/share/man/man1/${MAN_NAME}"
 
 	sudo systemctl daemon-reload
 
@@ -224,7 +225,7 @@ uninstall:
 	sudo rm /usr/bin/${BINARY_NAME}
 	sudo rm /usr/lib/systemd/user/${SERVICE_NAME}
 	sudo rm /usr/share/licenses/${PKG_NAME}/LICENSE
-	sudo rm /usr/share/man/man1/pulse-remote.1
+	sudo rm "/usr/share/man/man1/${MAN_NAME}"
 
 	systemctl --user daemon-reload
 
