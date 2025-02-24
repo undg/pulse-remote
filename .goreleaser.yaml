@@ -5,6 +5,7 @@
     # - make tidy
     # - go generate ./...
 
+version: 2  # Add this at top
 builds:
   - env:
       - CGO_ENABLED=0
