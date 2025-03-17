@@ -53,20 +53,20 @@ func MoveSourceOutput(sourceOutputID string, sourceName string) {
 	moveApp("source-output", sourceOutputID, sourceName)
 }
 
-func parseOutput(output string) Output {
+func parseSink(sinkName string) Sink {
 	idRe, _ := regexp.Compile(`Sink #(\d+)`)
 	nameRe, _ := regexp.Compile(`Name: (.+)`)
 	descRe, _ := regexp.Compile(`Description: (.+)`)
 	volumeRe, _ := regexp.Compile(`Volume: .+?(\d+)%`)
 	muteRe, _ := regexp.Compile(`Mute: (yes|no)`)
 
-	id, _ := strconv.Atoi(idRe.FindStringSubmatch(output)[1])
-	name := nameRe.FindStringSubmatch(output)[1]
-	desc := descRe.FindStringSubmatch(output)[1]
-	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
-	mute := muteRe.FindStringSubmatch(output)[1] == "yes"
+	id, _ := strconv.Atoi(idRe.FindStringSubmatch(sinkName)[1])
+	name := nameRe.FindStringSubmatch(sinkName)[1]
+	desc := descRe.FindStringSubmatch(sinkName)[1]
+	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(sinkName)[1])
+	mute := muteRe.FindStringSubmatch(sinkName)[1] == "yes"
 
-	return Output{
+	return Sink{
 		ID:     id,
 		Name:   name,
 		Label:  desc,
@@ -75,24 +75,24 @@ func parseOutput(output string) Output {
 	}
 }
 
-func GetOutputs() ([]Output, error) {
+func GetSinks() ([]Sink, error) {
 	cmd := exec.Command("pactl", "list", "sinks")
 	out, err := cmd.Output()
 	if err != nil {
 		return nil, err
 	}
 
-	sinks := strings.Split(string(out), "Sink #")
-	outputs := make([]Output, 0, len(sinks)-1)
+	sinksNames := strings.Split(string(out), "Sink #")
+	sinks := make([]Sink, 0, len(sinksNames)-1)
 
-	for _, sink := range sinks[1:] {
-		outputs = append(outputs, parseOutput("Sink #"+sink))
+	for _, sink := range sinksNames[1:] {
+		sinks = append(sinks, parseSink("Sink #"+sink))
 	}
 
-	return outputs, nil
+	return sinks, nil
 }
 
-func GetApps() ([]App, error) {
+func GetSinkInputs() ([]SinkInput, error) {
 	cmd := exec.Command("pactl", "list", "sink-inputs")
 	out, err := cmd.Output()
 	if err != nil {
@@ -105,13 +105,13 @@ func GetApps() ([]App, error) {
 	}
 	matches := re.FindAllStringSubmatch(string(out), -1)
 
-	apps := make([]App, len(matches))
+	sinkInputs := make([]SinkInput, len(matches))
 	for i, m := range matches {
 		id, err := strconv.Atoi(m[1])
 		if err != nil {
 			return nil, err
 		}
-		outputID, err := strconv.Atoi(m[2])
+		sinkID, err := strconv.Atoi(m[2])
 		if err != nil {
 			return nil, err
 		}
@@ -119,19 +119,19 @@ func GetApps() ([]App, error) {
 		if err != nil {
 			return nil, err
 		}
-		apps[i] = App{
-			ID:       id,
-			OutputID: outputID,
-			Label:    m[5],
-			Volume:   volume,
-			Muted:    m[3] == "yes",
+		sinkInputs[i] = SinkInput{
+			ID:     id,
+			SinkID: sinkID,
+			Label:  m[5],
+			Volume: volume,
+			Muted:  m[3] == "yes",
 		}
 	}
 
-	return apps, nil
+	return sinkInputs, nil
 }
 
-func parseSources(output string) Source {
+func parseSources(sourceName string) Source {
 	idRe, _ := regexp.Compile(`Source #(\d+)`)
 	nameRe, _ := regexp.Compile(`Name: (.+)`)
 	descRe, _ := regexp.Compile(`Description: (.+)`)
@@ -139,13 +139,13 @@ func parseSources(output string) Source {
 	muteRe, _ := regexp.Compile(`Mute: (yes|no)`)
 	monitorRe, _ := regexp.Compile(`Monitor of Sink: (.+)`) // n/a or name of the Sink
 
-	id, _ := strconv.Atoi(idRe.FindStringSubmatch(output)[1])
-	name := nameRe.FindStringSubmatch(output)[1]
-	desc := descRe.FindStringSubmatch(output)[1]
-	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(output)[1])
-	muted := muteRe.FindStringSubmatch(output)[1] == "yes"
-	monitored := monitorRe.FindStringSubmatch(output)[1] != "n/a"
-	monitor := monitorRe.FindStringSubmatch(output)[1]
+	id, _ := strconv.Atoi(idRe.FindStringSubmatch(sourceName)[1])
+	name := nameRe.FindStringSubmatch(sourceName)[1]
+	desc := descRe.FindStringSubmatch(sourceName)[1]
+	volume, _ := strconv.Atoi(volumeRe.FindStringSubmatch(sourceName)[1])
+	muted := muteRe.FindStringSubmatch(sourceName)[1] == "yes"
+	monitored := monitorRe.FindStringSubmatch(sourceName)[1] != "n/a"
+	monitor := monitorRe.FindStringSubmatch(sourceName)[1]
 
 	return Source{
 		ID:        id,
@@ -192,9 +192,9 @@ func ListenForChanges(callback func()) {
 func GetStatus() Status {
 	errPrefix := "ERROR [GetStatus()] -> "
 
-	outputs, err := GetOutputs()
+	sinks, err := GetSinks()
 	if err != nil {
-		logger.Error().Err(err).Msgf("%s GetOutputs()", errPrefix)
+		logger.Error().Err(err).Msgf("%s GetSinks()", errPrefix)
 	}
 
 	sources, err := GetSources()
@@ -202,17 +202,17 @@ func GetStatus() Status {
 		logger.Error().Err(err).Msgf("%s GetSources()", errPrefix)
 	}
 
-	apps, err := GetApps()
+	sinkInputs, err := GetSinkInputs()
 	if err != nil {
-		logger.Error().Err(err).Msgf("%s GetApps()", errPrefix)
+		logger.Error().Err(err).Msgf("%s GetSinkInputs()", errPrefix)
 	}
 
 	bi := buildinfo.Get()
 
 	return Status{
-		Outputs:   outputs,
-		Apps:      apps,
-		Sources:   sources,
-		BuildInfo: *bi,
+		Sinks:      sinks,
+		SinkInputs: sinkInputs,
+		Sources:    sources,
+		BuildInfo:  *bi,
 	}
 }

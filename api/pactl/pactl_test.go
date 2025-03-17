@@ -18,25 +18,25 @@ func playsilence() *exec.Cmd {
 }
 
 func TestGetStatus(t *testing.T) {
-	t.Run("Outputs", func(t *testing.T) {
+	t.Run("Sinks", func(t *testing.T) {
 		status := GetStatus()
-		if status.Outputs == nil {
-			t.Errorf("Missing Outputs in Status struct")
+		if status.Sinks == nil {
+			t.Errorf("Missing Sinks in Status struct")
 		}
 	})
 	t.Run("Apps", func(t *testing.T) {
 		cmd := playsilence()
 		defer cmd.Process.Kill()
 		status := GetStatus()
-		if status.Apps == nil {
+		if status.SinkInputs == nil {
 			t.Errorf("Missing Apps in Status struct")
 		}
 	})
 }
 
-func TestGetOutputs(t *testing.T) {
+func TestGetSinks(t *testing.T) {
 	t.Run("Volume", func(t *testing.T) {
-		sink, _ := GetOutputs()
+		sink, _ := GetSinks()
 		if sink[0].Volume < 0 {
 			t.Errorf("Expected volume more than 0, but got %d", sink[0].Volume)
 		}
@@ -56,7 +56,7 @@ func TestGetOutputs(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			sink, _ := GetOutputs()
+			sink, _ := GetSinks()
 			if got := re.MatchString(tt.Input); got != tt.Want {
 				t.Errorf("Expected name should starts with pattern, but got [%s]", sink[0].Name)
 			}
@@ -86,7 +86,7 @@ func TestGetSources(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.Name, func(t *testing.T) {
-			sink, _ := GetOutputs()
+			sink, _ := GetSinks()
 			if got := re.MatchString(tt.Input); got != tt.Want {
 				t.Errorf("Expected name should starts with pattern, but got [%s]", sink[0].Name)
 			}
