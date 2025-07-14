@@ -1,30 +1,39 @@
 package main
 
 import (
+	"embed"
 	"fmt"
-	"log"
+	"io"
 	"net/http"
-	"os"
 
-	"github.com/undg/go-prapi/buildinfo"
-	prapiJSON "github.com/undg/go-prapi/json"
-	"github.com/undg/go-prapi/utils"
-	"github.com/undg/go-prapi/ws"
+	"github.com/undg/go-prapi/api/buildinfo"
+	prJSON "github.com/undg/go-prapi/api/json"
+	"github.com/undg/go-prapi/api/logger"
+	"github.com/undg/go-prapi/api/utils"
+	"github.com/undg/go-prapi/api/ws"
 )
 
-// @TODO (undg) 2024-10-06: different port for dev and production
+// @TODO (undg) 2024-10-06: different port in config, env var or cli flag
+
+const webDist = "web/dist"
+
+//go:embed web/dist/*
+//go:embed web/dist/assets/*
+//go:embed web/dist/fonts/*
+//go:embed web/dist/icons/*
+var prWebDist embed.FS
 
 func startServer(mux *http.ServeMux) {
 	mux.HandleFunc("/api/", func(w http.ResponseWriter, r *http.Request) {
 		switch r.URL.Path {
 		case "/api/v1/schema/status":
-			prapiJSON.ServeStatusSchemaJSON(w, r)
+			prJSON.ServeStatusSchemaJSON(w, r)
 		case "/api/v1/schema/message":
-			prapiJSON.ServeMessageSchemaJSON(w, r)
+			prJSON.ServeMessageSchemaJSON(w, r)
 		case "/api/v1/schema/response":
-			prapiJSON.ServeResponseSchemaJSON(w, r)
+			prJSON.ServeResponseSchemaJSON(w, r)
 		case "/api/v1/status":
-			prapiJSON.ServeStatusRestJSON(w, r)
+			prJSON.ServeStatusRestJSON(w, r)
 		case "/api/v1/ws":
 			ws.HandleWebSocket(w, r)
 		default:
@@ -32,18 +41,30 @@ func startServer(mux *http.ServeMux) {
 		}
 	})
 
-	fs := http.FileServer(http.Dir("/tmp/bin/pr-web/dist"))
+	// Static files
+	fsys := http.FileServer(http.FS(prWebDist))
 	mux.Handle("/", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if _, err := os.Stat("/tmp/bin/pr-web/dist" + r.URL.Path); os.IsNotExist(err) {
-			http.ServeFile(w, r, "/tmp/bin/pr-web/dist/index.html")
-		} else {
-			fs.ServeHTTP(w, r)
+		path := webDist + r.URL.Path
+		_, err := prWebDist.Open(path)
+		if err != nil {
+			// File not exist, serve index.html
+			w.Header().Set("Content-Type", "text/html")
+			indexFile, _ := prWebDist.Open(webDist + "/index.html")
+			io.Copy(w, indexFile)
+			return
 		}
+		// File exists, serve it
+		r.URL.Path = path
+		fsys.ServeHTTP(w, r)
 	}))
+
 }
 
 func main() {
-	ip := utils.GetLocalIP()
+	ip, err := utils.GetLocalIP()
+	if err != nil {
+		logger.Error().Err(err).Msg("can't GetLocalIP()")
+	}
 	b := buildinfo.Get()
 
 	fmt.Print(`
@@ -56,11 +77,24 @@ func main() {
   Compiler:   `, b.Compiler, `
   Platform:   `, b.Platform, `
   GoVersion:  `, b.GoVersion, `
+  LogLevel:   `, logger.GetLevel(), `
+  DEBUG:      `, logger.DebugEnv, `
 └───────────────────────────────────────────────────┘
 `)
+	fmt.Println("\n🔥 Igniting server on ws://" + ip + utils.PORT)
+	fmt.Println("🔥 WebApp http://" + ip + utils.PORT + "\n")
 
-	fmt.Println("\n🔥 Igniting server on ws://" + ip + utils.PORT + "\n")
-	fmt.Println("🔥 webapp http://" + ip + utils.PORT + "\n")
+	fmt.Print(`──────────────────────────────────────────────────────────────
+`)
+	logger.Trace().Str("Trace", "ON").Msg("Log LEVEL")
+	logger.Debug().Str("Debug", "ON").Msg("Log LEVEL")
+	logger.Info().Str("Info", "ON").Msg("Log LEVEL")
+	logger.Warn().Str("Warn", "ON").Msg("Log LEVEL")
+	logger.Error().Str("Error", "ON").Msg("Log LEVEL")
+
+	fmt.Print(`──────────────────────────────────────────────────────────────
+
+`)
 
 	mux := http.NewServeMux()
 
@@ -68,8 +102,8 @@ func main() {
 
 	go ws.BroadcastUpdates()
 
-	err := http.ListenAndServe(utils.PORT, mux)
-	if err != nil {
-		log.Fatal("ERROR ", err)
+	errListenAndServe := http.ListenAndServe(utils.PORT, mux)
+	if errListenAndServe != nil {
+		logger.Fatal().Err(errListenAndServe).Msg("server failed to start")
 	}
 }

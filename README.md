@@ -1,4 +1,4 @@
-# go-prapi
+# pulse-remote
 
 ![test Pipewire](https://github.com/undg/go-prapi/actions/workflows/test-pipewire.yml/badge.svg)
 ![test PulseAudio](https://github.com/undg/go-prapi/actions/workflows/test-pulseaudio.yml/badge.svg)
@@ -53,10 +53,51 @@ Check the Makefile for available commands:
 - `make build`: Build the application
 - `make run/watch`: Run with auto-reload on file changes
 
-## License
+## Debugging
 
-This project is licensed under the GNU General Public License v2.0.
+Use build it logger. You can set environmental variable `DEBUG` to filter out or show more logs.
 
-## Contributing
+By default it's set to `"INFO"` or `"1"`.
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+All available options:
+
+* `"TRACE"` or `"3"`
+* `"DEBUG"` or `"2"`
+* `"INFO"` or `"1"`
+* `"WARN"` or `"0"`
+* `"ERR"` or `"-1"`
+
+
+Example of logger in the code.
+
+logger.Trace().Msg("from logger.Trace")
+logger.Debug().Msg("from logger.Debug")
+logger.Info().Msg("from logger.Info")
+logger.Warn().Msg("from logger.Warn")
+logger.Error().Msg("from logger.Error")
+logger.Fatal().Msg("from logger.Fatal")
+logger.Panic().Msg("from logger.Panic")
+
+# CLI snippets
+
+Few useful commands
+
+@TODO (undg) 2025-02-17: clean doc
+
+```bash
+make install
+
+make uninstall
+
+systemctl --user start pulse-remote.service
+
+systemctl --user set-environment DEBUG=trace # see available options in Debugging section
+
+systemctl --user restart pulse-remote.service
+
+systemctl --user unset-environment DEBUG
+
+journalctl --user -u pulse-remote.service -f --output cat
+
+```
+

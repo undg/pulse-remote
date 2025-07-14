@@ -1,6 +1,9 @@
 # Change these variables as necessary.
 MAIN_PACKAGE_PATH := .
-BINARY_NAME := prapi
+BINARY_NAME := pulse-remote-server
+PKG_NAME := pulse-remote
+SERVICE_NAME := pulse-remote.service
+MAN_NAME := pulse-remote.1
 
 BUILD_TIME=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 GIT_COMMIT=$(shell git rev-parse --short=7 HEAD)
@@ -57,7 +60,9 @@ tidy:
 	go mod tidy -v
 
 .PHONY: tidy/ci
-tidy/ci: tidy no-dirty
+tidy/ci:
+	make tidy
+	make no-dirty
 
 ## audit: run quality control checks
 .PHONY: audit/ci
@@ -68,7 +73,10 @@ audit/ci:
 	go run golang.org/x/vuln/cmd/govulncheck@latest ./...
 
 .PHONY: audit
-audit/full: tidy audit/ci test
+audit:
+	make tidy
+	make audit/ci 
+	make test
 
 # ==================================================================================== #
 # DEVELOPMENT
@@ -90,49 +98,8 @@ test/cover:
 	go test -v -race -buildvcs -coverprofile=/tmp/coverage.out ./...
 	go tool cover -html=/tmp/coverage.out
 
-## build: get latest frontend from github and build in /tmp/bin/pr-web/dist
-.PHONY: build/fe
-build/fe:
-	rm -rf /tmp/bin/pr-web
-	git clone "https://github.com/undg/pr-web" /tmp/bin/pr-web
-	cd /tmp/bin/pr-web && \
-	pnpm install && \
-	pnpm build
-
-## build: build the application
-.PHONY: build
-build: 
-	# Include additional build steps, like TypeScript, SCSS or Tailwind compilation here...
-	go build -ldflags=${LDFLAGS} -o=/tmp/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-
-## build: build the application together with frontend
-.PHONY: build/full
-build/full:
-	make build/fe
-	make build
-
-## run: build and run the application
-.PHONY: run
-run: build
-	while true; do /tmp/bin/${BINARY_NAME};sleep 1; done
-
-## run: build/full and run the application
-.PHONY: run/full
-run/full: build/full
-	/tmp/bin/${BINARY_NAME}
-
-## run/watch: run the application with reloading on file changes
-.PHONY: run/watch
-run/watch:
-	go run github.com/cosmtrek/air@v1.43.0 \
-		--build.cmd "make build" --build.bin "/tmp/bin/${BINARY_NAME}" --build.delay "100" \
-		--build.exclude_dir "" \
-		--build.include_ext "go, tpl, tmpl, html, css, scss, js, ts, sql, jpeg, jpg, gif, png, bmp, svg, webp, ico" \
-		--misc.clean_on_exit "true"
-
-
 # ==================================================================================== #
-# OPERATIONS
+# UTILS
 # ==================================================================================== #
 
 .PHONY: sink-type
@@ -153,11 +120,13 @@ source-type:
 
 ## typesgen: generate structs from json output
 .PHONY: typesgen
-typesgen: sink-type source-type tidy
+typesgen:
+	sink-type source-type tidy
 
 ## push: push changes to the remote Git repository
 .PHONY: push
-push: tidy audit no-dirty
+push:
+	tidy audit no-dirty
 	git push
 
 .PHONY: bump/patch
@@ -172,10 +141,92 @@ bump/minor:
 bump/main:
 	./scripts/bump.sh main
 
-## production/deploy: deploy the application to production
-.PHONY: production/deploy
-production/deploy: confirm tidy audit no-dirty
-	GOOS=linux GOARCH=amd64 go build -ldflags='-s' -o=/tmp/bin/linux_amd64/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-	upx -5 /tmp/bin/linux_amd64/${BINARY_NAME}
-	# Include additional deployment steps here...
-	
+# ==================================================================================== #
+# BUILD
+# ==================================================================================== #
+
+## update/web: get latest frontend from github and build in web/dist
+.PHONY: update/web 
+update/web:
+	## get latest frontend from github and build in web/dist
+	rm -rf /tmp/build/pr-web
+	mkdir -p /tmp/build/pr-web
+	git clone "https://github.com/undg/pr-web" /tmp/build/pr-web
+
+	cd /tmp/build/pr-web/ && \
+	pnpm install && \
+	pnpm test:ci && \
+	pnpm build
+
+	cd -
+
+	# pr-web current version:
+	cat web/version
+
+	git  -C /tmp/build/pr-web describe --long --abbrev=7 --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' > web/version
+
+	cp -r /tmp/build/pr-web/dist web
+
+	git reset
+	git add web
+	git commit -m "Update web to version $$(cat web/version)"
+
+	## pr-web latest version:
+	cat web/version
+
+
+## build/be: build the application
+.PHONY: build
+build: 
+	rm -rf build/bin
+	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
+
+## run: build and run the application
+.PHONY: run
+run:
+	make build
+	while true; do build/bin/${BINARY_NAME};sleep 1; done
+
+## run/watch: run the application with reloading on file changes
+.PHONY: run/watch
+run/watch:
+	go run github.com/cosmtrek/air@v1.43.0 \
+		--build.cmd "make build" --build.bin "build/bin/${BINARY_NAME}" --build.delay "100" \
+		--build.exclude_dir "" \
+		--build.include_ext "go, tpl, tmpl, html, css, scss, js, ts, sql, jpeg, jpg, gif, png, bmp, svg, webp, ico" \
+		--misc.clean_on_exit "true"
+
+
+# ==================================================================================== #
+# INSTALL
+# ==================================================================================== #
+
+.PHONY: install
+install:
+
+	make build
+	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
+
+	sudo install -Dm755 build/bin/${BINARY_NAME} /usr/bin/${BINARY_NAME}
+	sudo install -Dm644 os/${SERVICE_NAME} /usr/lib/systemd/user/${SERVICE_NAME}
+	sudo install -Dm644 "LICENSE" "/usr/share/licenses/${PKG_NAME}/LICENSE"
+	sudo install -Dm644 os/${MAN_NAME} "/usr/share/man/man1/${MAN_NAME}"
+
+	sudo systemctl daemon-reload
+
+	systemctl --user enable pulse-remote
+	systemctl --user start pulse-remote
+
+.PHONY: uninstall
+uninstall:
+	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
+	systemctl --user disable ${SERVICE_NAME} 
+
+	sudo rm /usr/bin/${BINARY_NAME}
+	sudo rm /usr/lib/systemd/user/${SERVICE_NAME}
+	sudo rm /usr/share/licenses/${PKG_NAME}/LICENSE
+	sudo rm "/usr/share/man/man1/${MAN_NAME}"
+
+	systemctl --user daemon-reload
+
+
