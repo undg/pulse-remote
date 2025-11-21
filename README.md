@@ -49,8 +49,12 @@ For detailed API documentation, connect to the WebSocket endpoint and send a `Ge
 
 Check the Makefile for available commands:
 
+- `make help`: list all scripts
 - `make test`: Run tests
-- `make build`: Build the application
+- `make build`: Build full application
+- `make build/be`: Build only backend server
+- `make build/web`: Pull from another repo and build web interface
+- `make build/desktop`: Pull from another repo and build desktop app
 - `make run/watch`: Run with auto-reload on file changes
 
 ## Debugging

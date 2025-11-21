@@ -175,11 +175,15 @@ build/web:
 	cat _GUI/web/version
 
 
-## build/be: build the application
-.PHONY: build
-build: 
+## build/be: build the backend server
+.PHONY: build/be
+build/be: 
 	rm -rf build/bin
 	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
+
+## build: build full application
+.PHONY: build
+build: build/web build/be
 
 ## run: build and run the application
 .PHONY: run
