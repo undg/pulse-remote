@@ -145,34 +145,34 @@ bump/main:
 # BUILD
 # ==================================================================================== #
 
-## update/web: get latest frontend from github and build in web/dist
-.PHONY: update/web 
-update/web:
+## build/web: get latest frontend from github and build in web/dist
+.PHONY: build/web 
+build/web:
 	## get latest frontend from github and build in web/dist
-	rm -rf /tmp/build/pr-web
-	mkdir -p /tmp/build/pr-web
-	git clone "https://github.com/undg/pr-web" /tmp/build/pr-web
+	rm -rf /tmp/build/pulse-remote-web
+	mkdir -p /tmp/build/pulse-remote-web
+	git clone "https://github.com/undg/pulse-remote-web" /tmp/build/pulse-remote-web
 
-	cd /tmp/build/pr-web/ && \
+	cd /tmp/build/pulse-remote-web/ && \
 	pnpm install && \
 	pnpm test:ci && \
 	pnpm build
 
 	cd -
 
-	# pr-web current version:
-	cat web/version
+	# pulse-remote-web old version:
+	cat _GUI/web/version
 
-	git  -C /tmp/build/pr-web describe --long --abbrev=7 --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' > web/version
+	git  -C /tmp/build/pulse-remote-web describe --long --abbrev=7 --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' > _GUI/web/version
 
-	cp -r /tmp/build/pr-web/dist web
+	cp -r /tmp/build/pulse-remote-web/dist web
 
 	git reset
 	git add web
-	git commit -m "Update web to version $$(cat web/version)"
+	git commit -m "Update web to version $$(cat _GUI/web/version)"
 
-	## pr-web latest version:
-	cat web/version
+	## pulse-remote-web new version:
+	cat _GUI/web/version
 
 
 ## build/be: build the application

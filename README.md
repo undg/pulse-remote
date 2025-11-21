@@ -28,18 +28,18 @@ go-prapi is a backend implementation for [pulse-remote](https://github.com/undg/
 
 ## Frontend
 
-An actively developed frontend for this API is available at [pr-web](https://github.com/undg/pr-web).
+An actively developed frontend for this API is available at [pulse-remote-web](https://github.com/undg/pulse-remote-web).
 
 To use the frontend:
 
-1. Build the pr-web project
+1. Build the pulse-remote-web project
 2. Copy or symlink the build output to the `frontend` folder in this project
 
-Example (if pr-web is in a sibling directory):
-```bash
-ln -s ../pr-web/dist frontend
-```
+Example (if pulse-remote-web is in a sibling directory):
 
+```bash
+ln -s ../pulse-remote-web/dist frontend
+```
 
 ## API
 
@@ -61,12 +61,11 @@ By default it's set to `"INFO"` or `"1"`.
 
 All available options:
 
-* `"TRACE"` or `"3"`
-* `"DEBUG"` or `"2"`
-* `"INFO"` or `"1"`
-* `"WARN"` or `"0"`
-* `"ERR"` or `"-1"`
-
+- `"TRACE"` or `"3"`
+- `"DEBUG"` or `"2"`
+- `"INFO"` or `"1"`
+- `"WARN"` or `"0"`
+- `"ERR"` or `"-1"`
 
 Example of logger in the code.
 
@@ -100,4 +99,3 @@ systemctl --user unset-environment DEBUG
 journalctl --user -u pulse-remote.service -f --output cat
 
 ```
-
