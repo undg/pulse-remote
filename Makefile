@@ -145,10 +145,9 @@ bump/main:
 # BUILD
 # ==================================================================================== #
 
-## build/web: get latest frontend from github and build in web/dist
+## build/web: get latest frontend from github and build in _GUI/web/dist
 .PHONY: build/web 
 build/web:
-	## get latest frontend from github and build in web/dist
 	rm -rf /tmp/build/pulse-remote-web
 	mkdir -p /tmp/build/pulse-remote-web
 	git clone "https://github.com/undg/pulse-remote-web" /tmp/build/pulse-remote-web
@@ -160,20 +159,22 @@ build/web:
 
 	cd -
 
+	mkdir -p _GUI/web/
+
 	# pulse-remote-web old version:
 	cat _GUI/web/version
 
 	git  -C /tmp/build/pulse-remote-web describe --long --abbrev=7 --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' > _GUI/web/version
 
-	cp -r /tmp/build/pulse-remote-web/dist web
+	cp -r /tmp/build/pulse-remote-web/dist _GUI/web
 
 	git reset
-	git add web
+	git add _GUI/web
+	git add _GUI/web/version
 	git commit -m "Update web to version $$(cat _GUI/web/version)"
 
 	## pulse-remote-web new version:
 	cat _GUI/web/version
-
 
 ## build/be: build the backend server
 .PHONY: build/be
