@@ -145,9 +145,9 @@ bump/main:
 # BUILD
 # ==================================================================================== #
 
-## build/web: get latest frontend from github and build in _GUI/web/dist
-.PHONY: build/web 
-build/web:
+## pull/web: get latest frontend from github and build in _GUI/web/dist
+.PHONY: pull/web 
+pull/web:
 	rm -rf /tmp/build/pulse-remote-web
 	mkdir -p /tmp/build/pulse-remote-web
 	git clone "https://github.com/undg/pulse-remote-web" /tmp/build/pulse-remote-web
@@ -176,15 +176,11 @@ build/web:
 	## pulse-remote-web new version:
 	cat _GUI/web/version
 
-## build/be: build the backend server
-.PHONY: build/be
-build/be: 
+## build: build the backend server
+.PHONY: build
+build: 
 	rm -rf build/bin
 	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
-
-## build: build full application
-.PHONY: build
-build: build/web build/be
 
 ## run: build and run the application
 .PHONY: run
