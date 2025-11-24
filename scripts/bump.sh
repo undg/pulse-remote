@@ -2,7 +2,7 @@
 
 RELEASE_TYPE=$1
 LATEST_TAG=$(git ls-remote -q --tags --sort=-v:refname | head -n1 | awk '{ print $2 }' | sed 's/refs\/tags\///g')
-LATEST_SHA=$(git rev-parse origin/dev)
+LATEST_SHA=$(git rev-parse dev)
 NEW_TAG=$(semver -c -i "$RELEASE_TYPE" "$LATEST_TAG")
 
 # echo $LATEST_TAG "v$NEW_TAG" $LATEST_SHA

@@ -9,7 +9,7 @@ BUILD_TIME=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 GIT_COMMIT=$(shell git rev-parse --short=7 HEAD)
 GIT_VERSION=$(shell git describe --tags --abbrev=0 | tr -d '\n')
 
-BUILD_PKG_PATH=github.com/undg/go-prapi/buildinfo
+BUILD_PKG_PATH=github.com/undg/go-prapi/api/buildinfo
 
 LDFLAGS="-X '${BUILD_PKG_PATH}.GitVersion=${GIT_VERSION}' \
 				-X '${BUILD_PKG_PATH}.BuildTime=${BUILD_TIME}' \
@@ -145,37 +145,38 @@ bump/main:
 # BUILD
 # ==================================================================================== #
 
-## update/web: get latest frontend from github and build in web/dist
-.PHONY: update/web 
-update/web:
-	## get latest frontend from github and build in web/dist
-	rm -rf /tmp/build/pr-web
-	mkdir -p /tmp/build/pr-web
-	git clone "https://github.com/undg/pr-web" /tmp/build/pr-web
+## pull/web: get latest frontend from github and build in _GUI/web/dist
+.PHONY: pull/web 
+pull/web:
+	rm -rf /tmp/build/pulse-remote-web
+	mkdir -p /tmp/build/pulse-remote-web
+	git clone "https://github.com/undg/pulse-remote-web" /tmp/build/pulse-remote-web
 
-	cd /tmp/build/pr-web/ && \
+	cd /tmp/build/pulse-remote-web/ && \
 	pnpm install && \
 	pnpm test:ci && \
 	pnpm build
 
 	cd -
 
-	# pr-web current version:
-	cat web/version
+	mkdir -p _GUI/web/
 
-	git  -C /tmp/build/pr-web describe --long --abbrev=7 --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' > web/version
+	# pulse-remote-web old version:
+	cat _GUI/web/version
 
-	cp -r /tmp/build/pr-web/dist web
+	git  -C /tmp/build/pulse-remote-web describe --long --abbrev=7 --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g' > _GUI/web/version
+
+	cp -r /tmp/build/pulse-remote-web/dist _GUI/web
 
 	git reset
-	git add web
-	git commit -m "Update web to version $$(cat web/version)"
+	git add _GUI/web
+	git add _GUI/web/version
+	git commit -m "Update web to version $$(cat _GUI/web/version)"
 
-	## pr-web latest version:
-	cat web/version
+	## pulse-remote-web new version:
+	cat _GUI/web/version
 
-
-## build/be: build the application
+## build: build the backend server
 .PHONY: build
 build: 
 	rm -rf build/bin

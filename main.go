@@ -15,12 +15,12 @@ import (
 
 // @TODO (undg) 2024-10-06: different port in config, env var or cli flag
 
-const webDist = "web/dist"
+const webDist = "_GUI/web/dist"
 
-//go:embed web/dist/*
-//go:embed web/dist/assets/*
-//go:embed web/dist/fonts/*
-//go:embed web/dist/icons/*
+//go:embed _GUI/web/dist/*
+//go:embed _GUI/web/dist/assets/*
+//go:embed _GUI/web/dist/fonts/*
+//go:embed _GUI/web/dist/icons/*
 var prWebDist embed.FS
 
 func startServer(mux *http.ServeMux) {

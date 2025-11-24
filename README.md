@@ -28,18 +28,18 @@ go-prapi is a backend implementation for [pulse-remote](https://github.com/undg/
 
 ## Frontend
 
-An actively developed frontend for this API is available at [pr-web](https://github.com/undg/pr-web).
+An actively developed frontend for this API is available at [pulse-remote-web](https://github.com/undg/pulse-remote-web).
 
 To use the frontend:
 
-1. Build the pr-web project
+1. Build the pulse-remote-web project
 2. Copy or symlink the build output to the `frontend` folder in this project
 
-Example (if pr-web is in a sibling directory):
-```bash
-ln -s ../pr-web/dist frontend
-```
+Example (if pulse-remote-web is in a sibling directory):
 
+```bash
+ln -s ../pulse-remote-web/dist frontend
+```
 
 ## API
 
@@ -49,8 +49,12 @@ For detailed API documentation, connect to the WebSocket endpoint and send a `Ge
 
 Check the Makefile for available commands:
 
+- `make help`: list all scripts
 - `make test`: Run tests
-- `make build`: Build the application
+- `make build`: Build full application
+- `make build/be`: Build only backend server
+- `make build/web`: Pull from another repo and build web interface
+- `make build/desktop`: Pull from another repo and build desktop app
 - `make run/watch`: Run with auto-reload on file changes
 
 ## Debugging
@@ -61,12 +65,11 @@ By default it's set to `"INFO"` or `"1"`.
 
 All available options:
 
-* `"TRACE"` or `"3"`
-* `"DEBUG"` or `"2"`
-* `"INFO"` or `"1"`
-* `"WARN"` or `"0"`
-* `"ERR"` or `"-1"`
-
+- `"TRACE"` or `"3"`
+- `"DEBUG"` or `"2"`
+- `"INFO"` or `"1"`
+- `"WARN"` or `"0"`
+- `"ERR"` or `"-1"`
 
 Example of logger in the code.
 
@@ -100,4 +103,3 @@ systemctl --user unset-environment DEBUG
 journalctl --user -u pulse-remote.service -f --output cat
 
 ```
-
