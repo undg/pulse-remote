@@ -18,7 +18,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up Go
-        uses: jdx/mise-action@v2
+        uses: jdx/mise-action@v3
 
       # Only for DEBUGING with remote shell
       # - name: Setup upterm session
