@@ -1,105 +1,219 @@
 # pulse-remote
 
-![test Pipewire](https://github.com/undg/go-prapi/actions/workflows/test-pipewire.yml/badge.svg)
-![test PulseAudio](https://github.com/undg/go-prapi/actions/workflows/test-pulseaudio.yml/badge.svg)
-![audit](https://github.com/undg/go-prapi/actions/workflows/audit.yml/badge.svg)
-![tidy](https://github.com/undg/go-prapi/actions/workflows/tidy.yml/badge.svg)
+![test Pipewire](https://github.com/undg/pulse-remote/actions/workflows/test-pipewire.yml/badge.svg)
+![test PulseAudio](https://github.com/undg/pulse-remote/actions/workflows/test-pulseaudio.yml/badge.svg)
+![audit](https://github.com/undg/pulse-remote/actions/workflows/audit.yml/badge.svg)
+![tidy](https://github.com/undg/pulse-remote/actions/workflows/tidy.yml/badge.svg)
 
-## Pulse Remote Backend
-
-A simple and powerful PulseAudio Remote API for Linux systems.
-
-## What is this?
-
-go-prapi is a backend implementation for [pulse-remote](https://github.com/undg/pulse-remote) written in Go. It provides a WebSocket-based API to control and gather information from PulseAudio devices and sinks.
+Control your Linux audio system remotely through a modern web interface or standalone desktop application.
 
 ## Features
 
-- Works with Linux PulseAudio and PipeWire
-- WebSocket communication for real-time updates
-- Control volume, mute status, and audio outputs
-- Retrieve information about audio cards and sinks
+- **Universal Compatibility**: Works with both PulseAudio and PipeWire
+- **Real-time Control**: Adjust volume, mute/unmute, and switch audio outputs instantly
+- **Multiple Interfaces**: Web app (built-in), desktop app, or API access
+- **WebSocket API**: Real-time updates and low-latency control
+- **Multi-device Support**: Manage all audio sinks, sources, and applications
 
-## Quick Start
+## Installation
 
-1. Clone the repository
-2. Run the server:
-3. The server will start on `ws://localhost:8448/api/v1/ws`
-
-## Frontend
-
-An actively developed frontend for this API is available at [pulse-remote-web](https://github.com/undg/pulse-remote-web).
-
-To use the frontend:
-
-1. Build the pulse-remote-web project
-2. Copy or symlink the build output to the `frontend` folder in this project
-
-Example (if pulse-remote-web is in a sibling directory):
+### Option 1: Arch Linux (AUR)
 
 ```bash
-ln -s ../pulse-remote-web/dist frontend
+yay -S pulse-remote-git
+# or
+paru -S pulse-remote-git
 ```
 
-## API
+The service will be installed and can be started with:
 
-For detailed API documentation, connect to the WebSocket endpoint and send a `GetSchema` action.
+```bash
+systemctl --user enable --now pulse-remote
+```
 
-## Development
+### Option 2: Download Release
 
-Check the Makefile for available commands:
-
-- `make help`: list all scripts
-- `make test`: Run tests
-- `make build`: Build full application
-- `make build/be`: Build only backend server
-- `make build/web`: Pull from another repo and build web interface
-- `make build/desktop`: Pull from another repo and build desktop app
-- `make run/watch`: Run with auto-reload on file changes
-
-## Debugging
-
-Use build it logger. You can set environmental variable `DEBUG` to filter out or show more logs.
-
-By default it's set to `"INFO"` or `"1"`.
-
-All available options:
-
-- `"TRACE"` or `"3"`
-- `"DEBUG"` or `"2"`
-- `"INFO"` or `"1"`
-- `"WARN"` or `"0"`
-- `"ERR"` or `"-1"`
-
-Example of logger in the code.
-
-logger.Trace().Msg("from logger.Trace")
-logger.Debug().Msg("from logger.Debug")
-logger.Info().Msg("from logger.Info")
-logger.Warn().Msg("from logger.Warn")
-logger.Error().Msg("from logger.Error")
-logger.Fatal().Msg("from logger.Fatal")
-logger.Panic().Msg("from logger.Panic")
-
-# CLI snippets
-
-Few useful commands
-
-@TODO (undg) 2025-02-17: clean doc
+Download the latest from the [releases page](https://github.com/undg/pulse-remote/releases) and run it directly, or install it with:
 
 ```bash
 make install
+```
 
-make uninstall
+### Option 3: Build from Source
 
-systemctl --user start pulse-remote.service
+```bash
+git clone https://github.com/undg/pulse-remote
+cd pulse-remote
+make build
+./build/bin/pulse-remote-server
+```
 
-systemctl --user set-environment DEBUG=trace # see available options in Debugging section
+## Usage
 
-systemctl --user restart pulse-remote.service
+### Web Application
 
-systemctl --user unset-environment DEBUG
-
-journalctl --user -u pulse-remote.service -f --output cat
+After starting the server, open your browser and navigate to:
 
 ```
+http://localhost:8448
+```
+
+The built-in web interface provides full control over your audio system.
+
+### Desktop Application
+
+For a native desktop experience, install the standalone app:
+
+```bash
+git clone https://github.com/undg/pulse-remote-desktop
+cd pulse-remote-desktop
+# Follow installation instructions in that repository
+```
+
+<!-- Or install from AUR: -->
+<!-- ```bash -->
+<!-- yay -S pulse-remote-desktop-git -->
+<!-- ``` -->
+
+### API Access
+
+The WebSocket API is available at:
+
+```
+ws://localhost:8448/api/v1/ws
+```
+
+REST endpoint for status:
+
+```
+http://localhost:8448/api/v1/status
+```
+
+For detailed API documentation, connect to the WebSocket endpoint and send a `GetSchema` action, or visit:
+
+```
+http://localhost:8448/api/v1/schema/status
+http://localhost:8448/api/v1/schema/message
+http://localhost:8448/api/v1/schema/response
+```
+
+## Configuration
+
+### Debug Logging
+
+Control log verbosity with the `DEBUG` environment variable:
+
+```bash
+# For systemd service
+systemctl --user set-environment DEBUG=trace
+systemctl --user restart pulse-remote
+
+# For direct execution
+DEBUG=debug ./build/bin/pulse-remote-server
+```
+
+Available levels:
+
+- `TRACE` or `3` - Most verbose
+- `DEBUG` or `2` - Debug information
+- `INFO` or `1` - Default level
+- `WARN` or `0` - Warnings only
+- `ERR` or `-1` - Errors only
+
+### View Logs
+
+```bash
+# For systemd service
+journalctl --user -u pulse-remote.service -f
+
+# Clean output
+journalctl --user -u pulse-remote.service -f --output cat
+```
+
+## Development
+
+### Prerequisites
+
+- Go 1.25.4 or later (preferably installed with mise)
+- PulseAudio or PipeWire
+- Make
+
+### Quick Start
+
+```bash
+# Install dependencies
+go mod download
+
+# Run tests
+make test
+
+# Run with hot reload
+make run/watch
+
+# Format and tidy code
+make tidy
+
+# Run full quality checks
+make audit
+```
+
+### Project Structure
+
+```
+pulse-remote/
+├── api/              # Core API implementation
+│   ├── pactl/       # PulseAudio/PipeWire control
+│   ├── ws/          # WebSocket handlers
+│   ├── json/        # JSON schemas and REST endpoints
+│   ├── logger/      # Logging setup
+│   └── utils/       # Utility functions
+├── _GUI/web/dist/   # Built-in web interface
+├── main.go          # Application entry point
+└── Makefile         # Build and development tasks
+```
+
+### Available Make Commands
+
+- `make help` - List all available commands
+- `make build` - Build the server binary
+- `make test` - Run all tests with race detection
+- `make test/watch` - Run tests in watch mode
+- `make test/cover` - Run tests with coverage report
+- `make tidy` - Format code and tidy dependencies
+- `make audit` - Run quality checks (vet, staticcheck, govulncheck)
+- `make run/watch` - Run with hot reload
+- `make install` - Install as systemd user service
+- `make uninstall` - Remove systemd user service
+
+### Testing
+
+Run all tests:
+
+```bash
+make test
+```
+
+Run specific test:
+
+```bash
+go test -v -race -buildvcs ./api/pactl -run TestGetSinks
+```
+
+Run tests in watch mode:
+
+```bash
+make test/watch
+```
+
+### Code Style
+
+See [AGENTS.md](AGENTS.md) for detailed coding guidelines.
+
+## Related Projects
+
+- [pulse-remote-web](https://github.com/undg/pulse-remote-web) - Web interface (included in this repo)
+- [pulse-remote-desktop](https://github.com/undg/pulse-remote-desktop) - Standalone desktop application
+
+## License
+
+See [LICENSE](LICENSE) file for details.
