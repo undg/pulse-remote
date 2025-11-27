@@ -161,15 +161,36 @@ make audit
 
 ```
 pulse-remote/
-├── api/              # Core API implementation
-│   ├── pactl/       # PulseAudio/PipeWire control
-│   ├── ws/          # WebSocket handlers
-│   ├── json/        # JSON schemas and REST endpoints
-│   ├── logger/      # Logging setup
-│   └── utils/       # Utility functions
-├── _GUI/web/dist/   # Built-in web interface
-├── main.go          # Application entry point
-└── Makefile         # Build and development tasks
+├── .github/
+│   └── workflows/         # CI/CD workflows (test, audit, tidy, release)
+├── api/                   # Core API implementation
+│   ├── buildinfo/         # Build metadata (version, commit, date)
+│   ├── json/              # JSON schemas and REST endpoints
+│   ├── logger/            # Zerolog logging setup
+│   ├── pactl/             # PulseAudio/PipeWire control
+│   │   └── generated/     # Auto-generated types from pactl JSON
+│   ├── utils/             # Utility functions (network, etc.)
+│   └── ws/                # WebSocket handlers and broadcasting
+├── _GUI/web/              # Built-in web interface
+│   ├── dist/              # Compiled web app assets
+│   └── version            # Web interface version
+├── os/                    # System integration files
+│   ├── pulse-remote.1     # Man page
+│   └── pulse-remote.service  # Systemd user service
+├── scripts/               # Build and development scripts
+│   ├── bump.sh            # Version bumping script
+│   └── test-watch.sh      # Watch mode test runner
+├── vendor/                # Vendored dependencies
+├── .gitignore             # Git ignore patterns
+├── .goreleaser.yaml       # GoReleaser configuration for releases
+├── .mise.toml             # Mise tool version configuration
+├── go.mod                 # Go module dependencies
+├── go.sum                 # Go module checksums
+├── LICENSE                # License file
+├── main.go                # Application entry point
+├── Makefile               # Build and development tasks
+├── README.md              # This file
+└── renovate.json          # Renovate dependency updates config
 ```
 
 ### Available Make Commands
