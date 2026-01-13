@@ -2,9 +2,9 @@ name: Test(pulseaudio)
 
 on:
   push:
-    branches: [dev]
+    branches: [master]
   pull_request:
-    branches: [dev]
+    branches: [master]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
