@@ -134,7 +134,7 @@ journalctl --user -u pulse-remote.service -f --output cat
 
 ### Prerequisites
 
-- Go 1.25.4 or later (preferably installed with mise)
+- Go 1.25 or later (preferably installed with mise)
 - PulseAudio or PipeWire
 - Make
 
