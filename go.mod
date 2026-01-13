@@ -6,7 +6,7 @@ require github.com/gorilla/websocket v1.5.3
 
 require (
 	github.com/danielgtaylor/huma v1.14.3
-	github.com/rs/zerolog v1.33.0
+	github.com/rs/zerolog v1.34.0
 )
 
 require (
