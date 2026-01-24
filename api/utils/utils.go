@@ -25,8 +25,6 @@ func IsLocalIP(ip net.IP) bool {
 		switch {
 		case ip4[0] == 10:
 			return true
-		case ip4[0] == 127 && ip4[1] == 0 && ip4[2] == 0 && ip4[3] == 1:
-			return true
 		case ip4[0] == 172 && ip4[1] >= 16 && ip4[1] <= 31:
 			return true
 		case ip4[0] == 192 && ip4[1] == 168:
