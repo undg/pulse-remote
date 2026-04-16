@@ -1,11 +1,11 @@
 # yaml-language-server: $schema=https://goreleaser.com/static/schema.json
 # This is an example .goreleaser.yml file with some sensible defaultsod tidy
 # before:
-  # hooks:
-    # - make tidy
-    # - go generate ./...
+# hooks:
+# - make tidy
+# - go generate ./...
 
-version: 2  # Add this at top
+version: 2 # Add this at top
 builds:
   - env:
       - CGO_ENABLED=0
@@ -23,16 +23,20 @@ archives:
       {{- else if eq .Arch "386" }}i386
       {{- else }}{{ .Arch }}{{ end }}
       {{- if .Arm }}v{{ .Arm }}{{ end }}
+    files:
+      - os/*
+      - README.md
+      - LICENSE
 checksum:
-  name_template: 'checksums.txt'
+  name_template: "checksums.txt"
 snapshot:
   name_template: "{{ incpatch .Version }}-next"
 changelog:
   sort: asc
   filters:
     exclude:
-      - '^docs:'
-      - '^test:'
+      - "^docs:"
+      - "^test:"
 
 # The lines beneath this are called `modelines`. See `:help modeline`
 # Feel free to remove those if you don't want/use them.
