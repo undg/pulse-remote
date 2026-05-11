@@ -53,6 +53,11 @@ endef
 # QUALITY CONTROL
 # ==================================================================================== #
 
+## update-go: update Go version to latest available in mise
+.PHONY: update-go
+update-go:
+	./scripts/update-go.sh
+
 ## tidy: format code and tidy modfile
 .PHONY: tidy
 tidy:
