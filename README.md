@@ -70,10 +70,13 @@ cd pulse-remote-desktop
 # Follow installation instructions in that repository
 ```
 
-<!-- Or install from AUR: -->
-<!-- ```bash -->
-<!-- yay -S pulse-remote-desktop-git -->
-<!-- ``` -->
+Or install from AUR:
+
+```bash
+yay -S pulse-remote-desktop
+# or
+paru -S pulse-remote-desktop
+```
 
 ### API Access
 
