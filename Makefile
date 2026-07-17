@@ -207,6 +207,7 @@ run/watch:
 # INSTALL
 # ==================================================================================== #
 
+## install: install the binary and systemd user service
 .PHONY: install
 install:
 
@@ -223,6 +224,7 @@ install:
 	systemctl --user enable pulse-remote
 	systemctl --user start pulse-remote
 
+## uninstall: remove the binary and systemd user service
 .PHONY: uninstall
 uninstall:
 	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
