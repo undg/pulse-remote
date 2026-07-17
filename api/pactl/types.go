@@ -10,11 +10,12 @@ type Status = struct {
 }
 
 type Sink struct {
-	ID     int    `json:"id" doc:"The id of the sink. Same  as name"`
-	Name   string `json:"name" doc:"The name of the sink. Same as id"`
-	Label  string `json:"label" doc:"Human-readable label for the sink"`
-	Volume int    `json:"volume" doc:"Current volume level of the sink"`
-	Muted  bool   `json:"muted" doc:"Whether the sink is muted"`
+	ID        int    `json:"id" doc:"The id of the sink. Same  as name"`
+	Name      string `json:"name" doc:"The name of the sink. Same as id"`
+	Label     string `json:"label" doc:"Human-readable label for the sink"`
+	Volume    int    `json:"volume" doc:"Current volume level of the sink"`
+	Muted     bool   `json:"muted" doc:"Whether the sink is muted"`
+	IsDefault bool   `json:"isDefault" doc:"Whether this sink is the current default"`
 }
 
 type Source struct {
@@ -25,6 +26,7 @@ type Source struct {
 	Muted     bool   `json:"muted" doc:"Whether the source is muted"`
 	Monitor   string `json:"monitor" doc:"Name of monitor source"`
 	Monitored bool   `json:"monitored" doc:"Whether source is being monitored"`
+	IsDefault bool   `json:"isDefault" doc:"Whether this source is the current default"`
 }
 
 type SinkInput struct {

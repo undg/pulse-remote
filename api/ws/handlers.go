@@ -50,6 +50,22 @@ func handleSetSinkMuted(msg *json.Message, res *json.Response) {
 	}
 }
 
+func handleSetDefaultSink(msg *json.Message, res *json.Response) {
+	if sinkInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sinkInfo["name"].(string)
+		if !ok {
+			logger.Error().Msg("sinkInfo['name'].(string) NOT OK")
+		}
+
+		pactl.SetDefaultSink(name)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid sink information format"
+		res.Status = json.StatusActionError
+	}
+}
+
 func handleSetSinkInputVolume(msg *json.Message, res *json.Response) {
 	if sinkInputInfo, ok := msg.Payload.(map[string]interface{}); ok {
 		id, ok := sinkInputInfo["id"].(float64)
@@ -148,6 +164,22 @@ func handleSetSourceMuted(msg *json.Message, res *json.Response) {
 		}
 
 		pactl.SetSourceMuted(name, muted)
+
+		res.Payload = pactl.GetStatus()
+	} else {
+		res.Error = "Invalid source information format"
+		res.Status = json.StatusActionError
+	}
+}
+
+func handleSetDefaultSource(msg *json.Message, res *json.Response) {
+	if sourceInfo, ok := msg.Payload.(map[string]interface{}); ok {
+		name, ok := sourceInfo["name"].(string)
+		if !ok {
+			logger.Error().Msg("sourceInfo['name'].(string) NOT OK")
+		}
+
+		pactl.SetDefaultSource(name)
 
 		res.Payload = pactl.GetStatus()
 	} else {

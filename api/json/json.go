@@ -14,8 +14,9 @@ const (
 	ActionGetBuildInfo Action = "GetBuildInfo"
 
 	// SINKS, e.g. Speakers
-	ActionSetSinkVolume Action = "SetSinkVolume"
-	ActionSetSinkMuted  Action = "SetSinkMuted"
+	ActionSetSinkVolume  Action = "SetSinkVolume"
+	ActionSetSinkMuted   Action = "SetSinkMuted"
+	ActionSetDefaultSink Action = "SetDefaultSink"
 
 	// Apps playing audio
 	ActionSetSinkInputVolume Action = "SetSinkInputVolume"
@@ -24,8 +25,9 @@ const (
 	ActionMoveSinkInput Action = "MoveSinkInput"
 
 	// SOURCES, e.g. Microphones
-	ActionSetSourceVolume Action = "SetSourceVolume"
-	ActionSetSourceMuted  Action = "SetSourceMuted"
+	ActionSetSourceVolume  Action = "SetSourceVolume"
+	ActionSetSourceMuted   Action = "SetSourceMuted"
+	ActionSetDefaultSource Action = "SetDefaultSource"
 
 	// Apps active access to microphones
 	ActionSetSourceInputVolume Action = "SetSourceInputVolume"
@@ -44,6 +46,7 @@ var AvailableCommands = []Action{
 	// SINKS, e.g. Speakers
 	ActionSetSinkVolume,
 	ActionSetSinkMuted,
+	ActionSetDefaultSink,
 
 	// Apps playing audio
 	ActionSetSinkInputVolume,
@@ -54,6 +57,7 @@ var AvailableCommands = []Action{
 	// SOURCES, e.g. Microphones
 	ActionSetSourceVolume,
 	ActionSetSourceMuted,
+	ActionSetDefaultSource,
 
 	// Apps active access to microphones
 	ActionSetSourceInputVolume,
@@ -67,7 +71,7 @@ var AvailableCommands = []Action{
 // Message is an request from the client
 type Message struct {
 	// Actions listed in availableCommands slice
-	Action Action `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..." enum:"GetStatus,GetBuildInfo,SetSinkVolume,SetSinkMuted,SetSinkInputVolume,SetSinkInputMuted,MoveSinkInput,SetSourceVolume,SetSourceMuted,SetSourceInputVolume,SetSourceInputMuted,MoveSourceOutput"`
+	Action Action `json:"action" doc:"Action to perform fe. GetVolume, SetVolume, SetMute..." enum:"GetStatus,GetBuildInfo,SetSinkVolume,SetSinkMuted,SetDefaultSink,SetSinkInputVolume,SetSinkInputMuted,MoveSinkInput,SetSourceVolume,SetSourceMuted,SetDefaultSource,SetSourceInputVolume,SetSourceInputMuted,MoveSourceOutput"`
 	// Paylod send with Set* actions if necessary
 	Payload interface{} `json:"payload,omitempty" doc:"Paylod send with Set* actions if necessary"`
 }

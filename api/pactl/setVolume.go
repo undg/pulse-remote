@@ -65,3 +65,20 @@ func moveApp(kind string, appID string, deviceName string) {
 		logger.Error().Err(err).Msg("exec.Command(pactl ***) FAIL in moveApp()")
 	}
 }
+
+// setDefault sets default sink or source device.
+//
+// Parameters:
+//   - kind: device type ("sink", "source")
+//   - name: device name
+func setDefault(kind string, name string) {
+	cmd := exec.Command("pactl", "set-default-"+kind, name)
+
+	logger.Debug().Msgf("$> pactl set-default-%s %s", kind, name)
+	logger.Info().Str("kind", kind).Str("name", name).Msg("exec.Command(pactl ***) in setDefault()")
+
+	_, err := cmd.Output()
+	if err != nil {
+		logger.Error().Err(err).Msg("exec.Command(pactl ***) FAIL in setDefault()")
+	}
+}

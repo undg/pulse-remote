@@ -85,6 +85,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleSetSinkVolume(&msg, &res)
 		case json.ActionSetSinkMuted:
 			handleSetSinkMuted(&msg, &res)
+		case json.ActionSetDefaultSink:
+			handleSetDefaultSink(&msg, &res)
 
 		// App's under SiNKS
 		case json.ActionSetSinkInputVolume:
@@ -99,6 +101,8 @@ func HandleWebSocket(w http.ResponseWriter, r *http.Request) {
 			handleSetSourceVolume(&msg, &res)
 		case json.ActionSetSourceMuted:
 			handleSetSourceMuted(&msg, &res)
+		case json.ActionSetDefaultSource:
+			handleSetDefaultSource(&msg, &res)
 
 		// App's under SOURCES
 		case json.ActionSetSourceInputVolume:

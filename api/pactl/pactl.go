@@ -19,6 +19,10 @@ func SetSinkMuted(sinkName string, muted bool) {
 	setMuted("sink", sinkName, muted)
 }
 
+func SetDefaultSink(sinkName string) {
+	setDefault("sink", sinkName)
+}
+
 func SetSinkInputVolume(sinkInputID string, volume string) {
 	setVolume("sink-input", sinkInputID, volume)
 }
@@ -41,6 +45,10 @@ func SetSourceMuted(sourceName string, muted bool) {
 
 }
 
+func SetDefaultSource(sourceName string) {
+	setDefault("source", sourceName)
+}
+
 func SetSourceInputVolume(sourceInputID string, volume string) {
 	setVolume("source-input", sourceInputID, volume)
 }
@@ -53,7 +61,7 @@ func MoveSourceOutput(sourceOutputID string, sourceName string) {
 	moveApp("source-output", sourceOutputID, sourceName)
 }
 
-func parseSink(sinkName string) Sink {
+func parseSink(sinkName string, defaultName string) Sink {
 	idRe, _ := regexp.Compile(`Sink #(\d+)`)
 	nameRe, _ := regexp.Compile(`Name: (.+)`)
 	descRe, _ := regexp.Compile(`Description: (.+)`)
@@ -67,15 +75,34 @@ func parseSink(sinkName string) Sink {
 	mute := muteRe.FindStringSubmatch(sinkName)[1] == "yes"
 
 	return Sink{
-		ID:     id,
-		Name:   name,
-		Label:  desc,
-		Volume: volume,
-		Muted:  mute,
+		ID:        id,
+		Name:      name,
+		Label:     desc,
+		Volume:    volume,
+		Muted:     mute,
+		IsDefault: name == defaultName,
 	}
 }
 
+func getDefaultSinkName() (string, error) {
+	cmd := exec.Command("pactl", "info")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	re, _ := regexp.Compile(`Default Sink: (.+)`)
+	matches := re.FindStringSubmatch(string(out))
+	if len(matches) < 2 {
+		return "", nil
+	}
+
+	return strings.TrimSpace(matches[1]), nil
+}
+
 func GetSinks() ([]Sink, error) {
+	defaultName, _ := getDefaultSinkName()
+
 	cmd := exec.Command("pactl", "list", "sinks")
 	out, err := cmd.Output()
 	if err != nil {
@@ -86,7 +113,7 @@ func GetSinks() ([]Sink, error) {
 	sinks := make([]Sink, 0, len(sinksNames)-1)
 
 	for _, sink := range sinksNames[1:] {
-		sinks = append(sinks, parseSink("Sink #"+sink))
+		sinks = append(sinks, parseSink("Sink #"+sink, defaultName))
 	}
 
 	return sinks, nil
@@ -131,7 +158,7 @@ func GetSinkInputs() ([]SinkInput, error) {
 	return sinkInputs, nil
 }
 
-func parseSources(sourceName string) Source {
+func parseSources(sourceName string, defaultName string) Source {
 	idRe, _ := regexp.Compile(`Source #(\d+)`)
 	nameRe, _ := regexp.Compile(`Name: (.+)`)
 	descRe, _ := regexp.Compile(`Description: (.+)`)
@@ -155,10 +182,29 @@ func parseSources(sourceName string) Source {
 		Muted:     muted,
 		Monitor:   monitor,
 		Monitored: monitored,
+		IsDefault: name == defaultName,
 	}
 }
 
+func getDefaultSourceName() (string, error) {
+	cmd := exec.Command("pactl", "info")
+	out, err := cmd.Output()
+	if err != nil {
+		return "", err
+	}
+
+	re, _ := regexp.Compile(`Default Source: (.+)`)
+	matches := re.FindStringSubmatch(string(out))
+	if len(matches) < 2 {
+		return "", nil
+	}
+
+	return strings.TrimSpace(matches[1]), nil
+}
+
 func GetSources() ([]Source, error) {
+	defaultName, _ := getDefaultSourceName()
+
 	cmd := exec.Command("pactl", "list", "sources")
 	out, err := cmd.Output()
 	if err != nil {
@@ -169,7 +215,7 @@ func GetSources() ([]Source, error) {
 	sources := make([]Source, 0, len(source)-1)
 
 	for _, sink := range source[1:] {
-		sources = append(sources, parseSources("Source #"+sink))
+		sources = append(sources, parseSources("Source #"+sink, defaultName))
 	}
 
 	return sources, nil
