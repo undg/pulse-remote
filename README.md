@@ -48,6 +48,22 @@ make build
 ./build/bin/pulse-remote-server
 ```
 
+### Option 4: Build from Source with Web Frontend
+
+To bundle the latest built-in web UI into the binary:
+
+```bash
+git clone https://github.com/undg/pulse-remote
+cd pulse-remote
+make pull/web
+make build
+make install
+```
+
+`make pull/web` fetches the latest [pulse-remote-web](https://github.com/undg/pulse-remote-web), runs its tests, builds it, and commits the generated `_GUI/web` assets.
+
+> Requires [pnpm](https://pnpm.io/) and Node.js installed.
+
 ## Usage
 
 ### Web Application
@@ -199,6 +215,7 @@ pulse-remote/
 ### Available Make Commands
 
 - `make help` - List all available commands
+- `make pull/web` - Pull and build the web frontend
 - `make build` - Build the server binary
 - `make test` - Run all tests with race detection
 - `make test/watch` - Run tests in watch mode
