@@ -9,7 +9,7 @@ YELLOW='\033[33m'
 RESET='\033[0m'
 
 # Get latest available Go version from mise
-VERSION=$(mise ls go | tail -1 | awk '{print $2}')
+VERSION=$(mise latest go)
 
 echo -e "${BOLD}${BLUE}==>${RESET} ${BOLD}Updating to Go ${VERSION}${RESET}"
 
