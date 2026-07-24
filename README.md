@@ -5,7 +5,7 @@
 ![audit](https://github.com/undg/pulse-remote/actions/workflows/audit.yml/badge.svg)
 ![tidy](https://github.com/undg/pulse-remote/actions/workflows/tidy.yml/badge.svg)
 
-Control your Linux audio system remotely through a modern web interface or standalone desktop application.
+Audio mixer for PulseAudio and PipeWire — local desktop app and web UI accessible from any device on your network.
 
 ## Features
 
@@ -25,30 +25,22 @@ yay -S pulse-remote-git
 paru -S pulse-remote-git
 ```
 
-The service will be installed and can be started with:
+The service is installed and auto-enabled. If needed, start manually with:
 
 ```bash
-systemctl --user enable --now pulse-remote
+systemctl --user enable --now pulse-remote.service
 ```
 
-### Option 2: Download Release
-
-Download the latest from the [releases page](https://github.com/undg/pulse-remote/releases) and run it directly, or install it with:
-
-```bash
-make install
-```
-
-### Option 3: Build from Source
+### Option 2: Build from Source
 
 ```bash
 git clone https://github.com/undg/pulse-remote
 cd pulse-remote
 make build
-./build/bin/pulse-remote-server
+make install-local
 ```
 
-### Option 4: Build from Source with Web Frontend
+### Option 3: Build from Source with Web Frontend
 
 To bundle the latest built-in web UI into the binary:
 
@@ -78,20 +70,11 @@ The built-in web interface provides full control over your audio system.
 
 ### Desktop Application
 
-For a native desktop experience, install the standalone app:
+The desktop app is bundled with the server — launch it from your application launcher
+or run:
 
 ```bash
-git clone https://github.com/undg/pulse-remote-desktop
-cd pulse-remote-desktop
-# Follow installation instructions in that repository
-```
-
-Or install from AUR:
-
-```bash
-yay -S pulse-remote-desktop
-# or
-paru -S pulse-remote-desktop
+pulse-remote-desktop
 ```
 
 ### API Access
@@ -223,8 +206,9 @@ pulse-remote/
 - `make tidy` - Format code and tidy dependencies
 - `make audit` - Run quality checks (vet, staticcheck, govulncheck)
 - `make run/watch` - Run with hot reload
-- `make install` - Install as systemd user service
-- `make uninstall` - Remove systemd user service
+- `make install` - Install files to $(DESTDIR)$(PREFIX) (for packaging)
+- `make install-local` - Install to /usr and enable systemd service
+- `make uninstall` - Remove installed files and disable service
 
 ### Testing
 
