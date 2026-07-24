@@ -181,6 +181,26 @@ pull/web:
 	## pulse-remote-web new version:
 	cat _GUI/web/version
 
+## pull/desktop: get latest desktop frontend, build asar, and copy into _GUI/desktop/
+.PHONY: pull/desktop 
+pull/desktop:
+	rm -rf /tmp/build/pulse-remote-desktop
+	mkdir -p /tmp/build/pulse-remote-desktop
+	git clone "https://github.com/undg/pulse-remote-desktop" /tmp/build/pulse-remote-desktop
+
+	cd /tmp/build/pulse-remote-desktop/ && \
+    mise trust && \
+    NODE_OPTIONS="--max-old-space-size=8192" pnpm install && \
+    pnpm build:unpacked
+
+	cd -
+
+	mkdir -p _GUI/desktop/
+	cp /tmp/build/pulse-remote-desktop/dist/linux-unpacked/resources/app.asar _GUI/desktop/
+	cp -r /tmp/build/pulse-remote-desktop/dist/linux-unpacked/resources/app.asar.unpacked _GUI/desktop/
+	cp /tmp/build/pulse-remote-desktop/resources/icon.png _GUI/desktop/icon.png
+
+
 ## build: build the backend server
 .PHONY: build
 build: 
@@ -207,34 +227,43 @@ run/watch:
 # INSTALL
 # ==================================================================================== #
 
-## install: install the binary and systemd user service
+PREFIX = /usr/local
+DESTDIR =
+
+## install: install all files to $(DESTDIR)$(PREFIX). Used by packaging and CI.
 .PHONY: install
-install:
+install: build
+	install -Dm755 "build/bin/${BINARY_NAME}" "$(DESTDIR)$(PREFIX)/bin/${BINARY_NAME}"
+	install -Dm755 "os/launcher.sh" "$(DESTDIR)$(PREFIX)/bin/pulse-remote-desktop"
+	install -Dm644 "_GUI/desktop/app.asar" "$(DESTDIR)$(PREFIX)/lib/pulse-remote/desktop/app.asar"
+	cp -r "_GUI/desktop/app.asar.unpacked" "$(DESTDIR)$(PREFIX)/lib/pulse-remote/desktop/"
+	install -Dm644 "os/pulse-remote.desktop" "$(DESTDIR)$(PREFIX)/share/applications/pulse-remote.desktop"
+	install -Dm644 "_GUI/desktop/icon.png" "$(DESTDIR)$(PREFIX)/share/icons/hicolor/256x256/apps/pulse-remote.png"
+	install -Dm644 "os/${SERVICE_NAME}" "$(DESTDIR)$(PREFIX)/lib/systemd/user/${SERVICE_NAME}"
+	install -Dm644 "os/${MAN_NAME}" "$(DESTDIR)$(PREFIX)/share/man/man1/${MAN_NAME}"
+	install -Dm644 "LICENSE" "$(DESTDIR)$(PREFIX)/share/licenses/${PKG_NAME}/LICENSE"
 
-	make build
+## install-local: install directly to /usr and enable systemd service (dev convenience)
+.PHONY: install-local
+install-local:
 	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
-
-	sudo install -Dm755 build/bin/${BINARY_NAME} /usr/bin/${BINARY_NAME}
-	sudo install -Dm644 os/${SERVICE_NAME} /usr/lib/systemd/user/${SERVICE_NAME}
-	sudo install -Dm644 "LICENSE" "/usr/share/licenses/${PKG_NAME}/LICENSE"
-	sudo install -Dm644 os/${MAN_NAME} "/usr/share/man/man1/${MAN_NAME}"
-
+	sudo make install PREFIX=/usr
 	sudo systemctl daemon-reload
+	systemctl --user enable --now ${SERVICE_NAME}
 
-	systemctl --user enable pulse-remote
-	systemctl --user start pulse-remote
-
-## uninstall: remove the binary and systemd user service
+## uninstall: remove all installed files
 .PHONY: uninstall
 uninstall:
 	@systemctl --user is-active ${SERVICE_NAME} >/dev/null 2>&1 && systemctl --user stop ${SERVICE_NAME} || true
-	systemctl --user disable ${SERVICE_NAME} 
+	systemctl --user disable ${SERVICE_NAME}
 
-	sudo rm /usr/bin/${BINARY_NAME}
-	sudo rm /usr/lib/systemd/user/${SERVICE_NAME}
-	sudo rm /usr/share/licenses/${PKG_NAME}/LICENSE
-	sudo rm "/usr/share/man/man1/${MAN_NAME}"
+	sudo rm -f "$(DESTDIR)$(PREFIX)/bin/${BINARY_NAME}"
+	sudo rm -f "$(DESTDIR)$(PREFIX)/bin/pulse-remote-desktop"
+	sudo rm -rf "$(DESTDIR)$(PREFIX)/lib/pulse-remote"
+	sudo rm -f "$(DESTDIR)$(PREFIX)/share/applications/pulse-remote.desktop"
+	sudo rm -f "$(DESTDIR)$(PREFIX)/share/icons/hicolor/256x256/apps/pulse-remote.png"
+	sudo rm -f "$(DESTDIR)$(PREFIX)/lib/systemd/user/${SERVICE_NAME}"
+	sudo rm -f "$(DESTDIR)$(PREFIX)/share/man/man1/${MAN_NAME}"
+	sudo rm -rf "$(DESTDIR)$(PREFIX)/share/licenses/${PKG_NAME}"
 
 	systemctl --user daemon-reload
-
-

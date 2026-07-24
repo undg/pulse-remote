@@ -1,29 +1,55 @@
-.TH PULSE-REMOTE 1 "2024" "pulse-remote" "User Commands"
+.TH PULSE-REMOTE 1 "2026" "pulse-remote" "User Commands"
 .SH NAME
 pulse-remote \- Remote audio control for PulseAudio/PipeWire
 .SH SYNOPSIS
 .B pulse-remote-server
+.br
+.B pulse-remote-desktop
 .SH DESCRIPTION
-Pulse Remote provides web interface to control audio volume on Linux systems running PulseAudio or PipeWire.
-.SH USAGE
+Pulse Remote provides a web interface and desktop application to control audio
+volume on Linux systems running PulseAudio or PipeWire.
 .PP
-Enable and start service:
+.B pulse-remote-server
+is the backend daemon that serves the WebSocket API and web UI.
+.PP
+.B pulse-remote-desktop
+launches the Electron desktop wrapper around the web UI.
+.SH USAGE
+.SS Server
+Enable and start the user service:
 .PP
 .nf
 .RS 4
-systemctl --user enable pulse-remote.service
-systemctl --user start pulse-remote.service
-.fi
+systemctl --user enable --now pulse-remote.service
 .RE
+.fi
 .PP
-Then open web interface:
+Web interface available at:
 .PP
 .RS 4
 http://localhost:8448
 .RE
+.SS Desktop App
+Launch from your application launcher or run:
+.PP
+.nf
+.RS 4
+pulse-remote-desktop
+.RE
+.fi
+.SH FILES
+.TP
+.I /usr/bin/pulse-remote-server
+Backend server binary.
+.TP
+.I /usr/bin/pulse-remote-desktop
+Electron desktop launcher.
+.TP
+.I /usr/lib/systemd/user/pulse-remote.service
+systemd user service unit.
 .SH AUTHOR
 Written by Bartek Laskowski <bartek@undg.dev>
 .SH BUGS
 Report bugs at: https://github.com/undg/pulse-remote/issues
 .SH COPYRIGHT
-Copyright \(co 2024 Bartek Laskowski. MIT License.
+Copyright \(co 2024\-2026 Bartek Laskowski. MIT License.
