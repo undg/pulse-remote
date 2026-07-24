@@ -1,9 +1,7 @@
 #!/bin/sh
 
-PID=$(pgrep -f '/usr/lib/pulse-remote/desktop/app\.asar')
-
-if [ -z "$PID" ]; then
-	exec electron /usr/lib/pulse-remote/desktop/app.asar "$@"
+if pkill -0 -f '/usr/lib/pulse-remote/desktop/app\.asar' 2>/dev/null; then
+	pkill -f '/usr/lib/pulse-remote/desktop/app\.asar'
 else
-	kill "$PID"
+	exec electron /usr/lib/pulse-remote/desktop/app.asar "$@"
 fi
