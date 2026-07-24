@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Pulse Remote
+Comment=Remote audio control for PulseAudio/PipeWire
+Exec=pulse-remote-desktop
+Icon=pulse-remote
+Terminal=false
+Type=Application
+Categories=Audio;Utility;
+StartupWMClass=pulse-remote-desktop
