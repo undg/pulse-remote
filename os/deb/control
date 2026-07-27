@@ -1,0 +1,19 @@
+Package: pulse-remote
+Version: @VERSION@
+Section: sound
+Priority: optional
+Architecture: amd64
+Maintainer: undg <undg@undg.dev>
+Depends: libpulse0, systemd
+Recommends: electron
+Description: Remote audio control for PulseAudio/PipeWire
+ pulse-remote lets you control PulseAudio/PipeWire audio
+ from any device on your network via a web interface.
+ .
+ Includes a systemd user service (pulse-remote.service) and
+ an optional Electron desktop launcher (pulse-remote-desktop).
+ .
+ The desktop launcher requires Electron to be installed
+ separately. Install it from https://github.com/electron/electron
+ or your package manager.
+Homepage: https://github.com/undg/pulse-remote

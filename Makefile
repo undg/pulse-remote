@@ -217,6 +217,44 @@ package: build
 	sha256sum pulse-remote_*.tar.gz > checksums.txt
 	@echo "Release artifacts: pulse-remote_$${PKG_VER}_Linux_x86_64.tar.gz checksums.txt"
 
+## deb: build .deb package
+.PHONY: deb
+deb: build
+	PKG_VER=$$(echo "$(GIT_VERSION)" | sed 's/^v//'); \
+	rm -rf /tmp/pulse-deb; \
+	make install DESTDIR=/tmp/pulse-deb/pkg PREFIX=/usr; \
+	mkdir -p /tmp/pulse-deb/pkg/DEBIAN; \
+	sed "s/@VERSION@/$${PKG_VER}/" os/deb/control > /tmp/pulse-deb/pkg/DEBIAN/control; \
+	cp os/deb/postinst /tmp/pulse-deb/pkg/DEBIAN/postinst; \
+	cp os/deb/prerm /tmp/pulse-deb/pkg/DEBIAN/prerm; \
+	chmod 755 /tmp/pulse-deb/pkg/DEBIAN/postinst /tmp/pulse-deb/pkg/DEBIAN/prerm; \
+	dpkg-deb --build /tmp/pulse-deb/pkg "pulse-remote_$${PKG_VER}_amd64.deb"; \
+	rm -rf /tmp/pulse-deb; \
+	@echo "Release artifact: pulse-remote_$${PKG_VER}_amd64.deb"
+
+## rpm: build .rpm package (requires rpmbuild)
+.PHONY: rpm
+rpm: build
+	PKG_VER=$$(echo "$(GIT_VERSION)" | sed 's/^v//'); \
+	rm -rf /tmp/pulse-rpm; \
+	mkdir -p /tmp/pulse-rpm/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}; \
+	make install DESTDIR=/tmp/pulse-rpm/buildroot PREFIX=/usr; \
+	mv /tmp/pulse-rpm/buildroot "/tmp/pulse-rpm/pulse-remote-$${PKG_VER}"; \
+	tar czf "/tmp/pulse-rpm/rpmbuild/SOURCES/pulse-remote-$${PKG_VER}.tar.gz" \
+		-C /tmp/pulse-rpm "pulse-remote-$${PKG_VER}"; \
+	sed "s/@VERSION@/$${PKG_VER}/" os/rpm/pulse-remote.spec \
+		> /tmp/pulse-rpm/rpmbuild/SPECS/pulse-remote.spec; \
+	rpmbuild -bb --define "_topdir /tmp/pulse-rpm/rpmbuild" \
+		/tmp/pulse-rpm/rpmbuild/SPECS/pulse-remote.spec; \
+	mv /tmp/pulse-rpm/rpmbuild/RPMS/x86_64/*.rpm .; \
+	rm -rf /tmp/pulse-rpm; \
+	@echo "Release artifacts: pulse-remote-$${PKG_VER}-1.*.rpm"
+
+## packages: build all release artifacts (tarball + deb + rpm)
+.PHONY: packages
+packages: package deb rpm
+	sha256sum pulse-remote_*.tar.gz pulse-remote_*_amd64.deb pulse-remote-*.x86_64.rpm > checksums.txt
+
 ## run: build and run the application
 .PHONY: run
 run:

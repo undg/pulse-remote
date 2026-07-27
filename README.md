@@ -19,10 +19,16 @@ Audio mixer for PulseAudio and PipeWire — local desktop app and web UI accessi
 
 ### Option 1: Arch Linux (AUR)
 
+Two packages are available:
+
+- **`pulse-remote-bin`** — Pre-built binary, no compilation needed
+- **`pulse-remote-git`** — Builds from latest git source
+
 ```bash
+# Pre-built binary (fast install)
+yay -S pulse-remote-bin
+# or build from source
 yay -S pulse-remote-git
-# or
-paru -S pulse-remote-git
 ```
 
 The service is installed and auto-enabled. If needed, start manually with:
