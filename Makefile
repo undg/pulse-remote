@@ -213,9 +213,9 @@ package: build
 	make install DESTDIR=/tmp/pulse-pkg PREFIX=/usr
 	PKG_VER=$$(echo "$(GIT_VERSION)" | sed 's/^v//'); \
 	tar czf "pulse-remote_$${PKG_VER}_Linux_x86_64.tar.gz" -C /tmp/pulse-pkg .
-	rm -rf /tmp/pulse-pkg
-	sha256sum pulse-remote_*.tar.gz > checksums.txt
-	@echo "Release artifacts: pulse-remote_$${PKG_VER}_Linux_x86_64.tar.gz checksums.txt"
+	rm -rf /tmp/pulse-pkg; \
+	sha256sum pulse-remote_*.tar.gz > checksums.txt; \
+	echo "Release artifacts: pulse-remote_$${PKG_VER}_Linux_x86_64.tar.gz checksums.txt"
 
 ## deb: build .deb package
 .PHONY: deb
@@ -230,7 +230,7 @@ deb: build
 	chmod 755 /tmp/pulse-deb/pkg/DEBIAN/postinst /tmp/pulse-deb/pkg/DEBIAN/prerm; \
 	dpkg-deb --build /tmp/pulse-deb/pkg "pulse-remote_$${PKG_VER}_amd64.deb"; \
 	rm -rf /tmp/pulse-deb; \
-	@echo "Release artifact: pulse-remote_$${PKG_VER}_amd64.deb"
+	echo "Release artifact: pulse-remote_$${PKG_VER}_amd64.deb"
 
 ## rpm: build .rpm package (requires rpmbuild)
 .PHONY: rpm
