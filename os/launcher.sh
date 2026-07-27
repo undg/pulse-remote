@@ -9,8 +9,8 @@ if ! command -v electron >/dev/null 2>&1; then
 	exit 1
 fi
 
-if pkill -0 -f '/usr/lib/pulse-remote/desktop/app\.asar' 2>/dev/null; then
-	pkill -f '/usr/lib/pulse-remote/desktop/app\.asar'
-else
-	exec electron /usr/lib/pulse-remote/desktop/app.asar "$@"
-fi
+# Always exec — the single-instance lock in the app handles toggle:
+#   - Not running  → starts and shows the window
+#   - Already running → toggles visibility of the existing instance
+
+exec electron /usr/lib/pulse-remote/desktop/app.asar "$@"
