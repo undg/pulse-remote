@@ -207,6 +207,16 @@ build:
 	rm -rf build/bin
 	go build -ldflags=${LDFLAGS} -o=build/bin/${BINARY_NAME} ${MAIN_PACKAGE_PATH}
 
+## package: create release tarball with full FHS install tree (for aur-bin)
+.PHONY: package
+package: build
+	make install DESTDIR=/tmp/pulse-pkg PREFIX=/usr
+	PKG_VER=$$(echo "$(GIT_VERSION)" | sed 's/^v//'); \
+	tar czf "pulse-remote_$${PKG_VER}_Linux_x86_64.tar.gz" -C /tmp/pulse-pkg .
+	rm -rf /tmp/pulse-pkg
+	sha256sum pulse-remote_*.tar.gz > checksums.txt
+	@echo "Release artifacts: pulse-remote_$${PKG_VER}_Linux_x86_64.tar.gz checksums.txt"
+
 ## run: build and run the application
 .PHONY: run
 run:
