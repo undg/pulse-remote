@@ -37,7 +37,35 @@ The service is installed and auto-enabled. If needed, start manually with:
 systemctl --user enable --now pulse-remote.service
 ```
 
-### Option 2: Build from Source
+### Option 2: Debian/Ubuntu (.deb)
+
+Download the `.deb` package from the [latest release](https://github.com/undg/pulse-remote/releases/latest):
+
+```bash
+sudo apt install ./pulse-remote_<version>_amd64.deb
+```
+
+The server starts automatically as a systemd user service. For the desktop launcher,
+you need Electron installed separately:
+
+```bash
+# Electron is not in Debian/Ubuntu repos — download from GitHub:
+# https://github.com/electron/electron/releases
+```
+
+The server works fine without Electron — only the desktop launcher needs it.
+
+### Option 3: Fedora/RHEL (.rpm)
+
+Download the `.rpm` package from the [latest release](https://github.com/undg/pulse-remote/releases/latest):
+
+```bash
+sudo dnf install ./pulse-remote-<version>-1.x86_64.rpm
+```
+
+Same as above — Electron is recommended but not required. The systemd user service starts automatically.
+
+### Option 4: Build from Source
 
 ```bash
 git clone https://github.com/undg/pulse-remote
@@ -46,7 +74,7 @@ make build
 make install-local
 ```
 
-### Option 3: Build from Source with Web Frontend
+### Option 5: Build from Source with Web Frontend
 
 To bundle the latest built-in web UI into the binary:
 
@@ -183,6 +211,8 @@ pulse-remote/
 │   ├── dist/              # Compiled web app assets
 │   └── version            # Web interface version
 ├── os/                    # System integration files
+│   ├── deb/              # Debian packaging (control, postinst, prerm)
+│   ├── rpm/              # RPM packaging (spec file)
 │   ├── pulse-remote.1     # Man page
 │   └── pulse-remote.service  # Systemd user service
 ├── scripts/               # Build and development scripts
@@ -190,7 +220,7 @@ pulse-remote/
 │   └── test-watch.sh      # Watch mode test runner
 ├── vendor/                # Vendored dependencies
 ├── .gitignore             # Git ignore patterns
-├── .github/workflows/release.yml  # CI release workflow (make package + upload)
+├── .github/workflows/release.yml  # CI release workflow (make packages + upload)
 ├── .mise.toml             # Mise tool version configuration
 ├── go.mod                 # Go module dependencies
 ├── go.sum                 # Go module checksums
@@ -214,6 +244,10 @@ pulse-remote/
 - `make run/watch` - Run with hot reload
 - `make install` - Install files to $(DESTDIR)$(PREFIX) (for packaging)
 - `make install-local` - Install to /usr and enable systemd service
+- `make package` - Create release tarball with FHS install tree
+- `make deb` - Build .deb package (requires dpkg-deb)
+- `make rpm` - Build .rpm package (requires rpmbuild)
+- `make packages` - Build all release artifacts (tarball + deb + rpm + checksums)
 - `make uninstall` - Remove installed files and disable service
 
 ### Testing
