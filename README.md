@@ -184,7 +184,7 @@ pulse-remote/
 │   └── test-watch.sh      # Watch mode test runner
 ├── vendor/                # Vendored dependencies
 ├── .gitignore             # Git ignore patterns
-├── .goreleaser.yaml       # GoReleaser configuration for releases
+├── .github/workflows/release.yml  # CI release workflow (make package + upload)
 ├── .mise.toml             # Mise tool version configuration
 ├── go.mod                 # Go module dependencies
 ├── go.sum                 # Go module checksums

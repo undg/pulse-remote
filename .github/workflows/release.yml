@@ -1,15 +1,15 @@
-name: Release Go project
+name: Release
 
 on:
   push:
     tags:
-      - "*" # triggers only if push new tag version, like `0.8.4` or else
+      - 'v[0-9]+.[0-9]+.[0-9]+'
 
 permissions:
   contents: write
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -17,20 +17,20 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Verify tag is on master
+        run: |
+          git branch -r --contains ${{ github.ref_name }} | grep -q 'origin/master' || \
+          (echo "Tag ${{ github.ref_name }} is not on master branch. Aborting." && exit 1)
+
       - name: Set up Go
         uses: jdx/mise-action@v4
 
-      # Only for DEBUGING with remote shell
-      # - name: Setup upterm session
-      #   uses: lhotari/action-upterm@v1
+      - name: Build release artifacts
+        run: make package
 
-      - name: Run GoReleaser
-        uses: goreleaser/goreleaser-action@v7
+      - name: Upload to release
+        uses: softprops/action-gh-release@v2
         with:
-          # either 'goreleaser' (default) or 'goreleaser-pro'
-          distribution: goreleaser
-          version: 2
-          args: release --clean
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+          files: |
+            pulse-remote_*.tar.gz
+            checksums.txt
