@@ -7,8 +7,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/undg/go-prapi/api/buildinfo"
-	"github.com/undg/go-prapi/api/logger"
+	"github.com/undg/pulse-remote/api/buildinfo"
+	"github.com/undg/pulse-remote/api/logger"
 )
 
 func SetSinkVolume(sinkName string, volume string) {

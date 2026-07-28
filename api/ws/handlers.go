@@ -3,9 +3,9 @@ package ws
 import (
 	"fmt"
 
-	"github.com/undg/go-prapi/api/json"
-	"github.com/undg/go-prapi/api/logger"
-	"github.com/undg/go-prapi/api/pactl"
+	"github.com/undg/pulse-remote/api/json"
+	"github.com/undg/pulse-remote/api/logger"
+	"github.com/undg/pulse-remote/api/pactl"
 )
 
 func handleSetSinkVolume(msg *json.Message, res *json.Response) {

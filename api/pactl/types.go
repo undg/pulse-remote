@@ -1,6 +1,6 @@
 package pactl
 
-import "github.com/undg/go-prapi/api/buildinfo"
+import "github.com/undg/pulse-remote/api/buildinfo"
 
 type Status = struct {
 	Sinks      []Sink              `json:"sinks" doc:"List of audio devices"`

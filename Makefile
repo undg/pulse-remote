@@ -9,7 +9,7 @@ BUILD_TIME=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')
 GIT_COMMIT=$(shell git rev-parse --short=7 HEAD)
 GIT_VERSION=$(shell git describe --tags --exact-match 2>/dev/null || git describe --tags --dirty 2>/dev/null || echo "unknown")
 
-BUILD_PKG_PATH=github.com/undg/go-prapi/api/buildinfo
+BUILD_PKG_PATH=github.com/undg/pulse-remote/api/buildinfo
 
 LDFLAGS="-X '${BUILD_PKG_PATH}.GitVersion=${GIT_VERSION}' \
 				-X '${BUILD_PKG_PATH}.BuildTime=${BUILD_TIME}' \

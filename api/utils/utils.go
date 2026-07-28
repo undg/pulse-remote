@@ -3,7 +3,7 @@ package utils
 import (
 	"net"
 
-	"github.com/undg/go-prapi/api/json"
+	"github.com/undg/pulse-remote/api/json"
 )
 
 const PORT = ":8448"

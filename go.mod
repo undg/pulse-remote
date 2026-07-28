@@ -1,4 +1,4 @@
-module github.com/undg/go-prapi
+module github.com/undg/pulse-remote
 
 go 1.26.5
 
