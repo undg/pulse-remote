@@ -38,7 +38,7 @@ cp -a ./* %{buildroot}/
 /usr/share/applications/pulse-remote.desktop
 /usr/share/icons/hicolor/256x256/apps/pulse-remote.png
 /usr/lib/systemd/user/pulse-remote.service
-/usr/share/man/man1/pulse-remote.1
+/usr/share/man/man1/pulse-remote.1*
 /usr/share/licenses/pulse-remote/LICENSE
 
 %post
