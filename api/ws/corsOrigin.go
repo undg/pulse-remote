@@ -6,8 +6,8 @@ import (
 	"strings"
 
 	"github.com/gorilla/websocket"
-	"github.com/undg/go-prapi/api/logger"
-	"github.com/undg/go-prapi/api/utils"
+	"github.com/undg/pulse-remote/api/logger"
+	"github.com/undg/pulse-remote/api/utils"
 )
 
 var upgrader = websocket.Upgrader{

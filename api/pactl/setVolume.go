@@ -5,7 +5,7 @@ import (
 	"os/exec"
 	"strconv"
 
-	"github.com/undg/go-prapi/api/logger"
+	"github.com/undg/pulse-remote/api/logger"
 )
 
 // setVolume adjusts volume state for PulseAudio devices.

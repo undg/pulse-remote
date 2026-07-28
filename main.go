@@ -6,11 +6,11 @@ import (
 	"io"
 	"net/http"
 
-	"github.com/undg/go-prapi/api/buildinfo"
-	prJSON "github.com/undg/go-prapi/api/json"
-	"github.com/undg/go-prapi/api/logger"
-	"github.com/undg/go-prapi/api/utils"
-	"github.com/undg/go-prapi/api/ws"
+	"github.com/undg/pulse-remote/api/buildinfo"
+	prJSON "github.com/undg/pulse-remote/api/json"
+	"github.com/undg/pulse-remote/api/logger"
+	"github.com/undg/pulse-remote/api/utils"
+	"github.com/undg/pulse-remote/api/ws"
 )
 
 // @TODO (undg) 2024-10-06: different port in config, env var or cli flag

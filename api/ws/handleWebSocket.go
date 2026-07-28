@@ -7,10 +7,10 @@ import (
 
 	"github.com/gorilla/websocket"
 
-	"github.com/undg/go-prapi/api/json"
-	"github.com/undg/go-prapi/api/logger"
-	"github.com/undg/go-prapi/api/pactl"
-	"github.com/undg/go-prapi/api/utils"
+	"github.com/undg/pulse-remote/api/json"
+	"github.com/undg/pulse-remote/api/logger"
+	"github.com/undg/pulse-remote/api/pactl"
+	"github.com/undg/pulse-remote/api/utils"
 )
 
 var clients = make(map[*websocket.Conn]bool)
