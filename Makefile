@@ -210,6 +210,7 @@ build:
 ## package: create release tarball with full FHS install tree (for aur-bin)
 .PHONY: package
 package: build
+	set -e
 	make install DESTDIR=/tmp/pulse-pkg PREFIX=/usr
 	PKG_VER=$$(echo "$(GIT_VERSION)" | sed 's/^v//')
 	tar czf "pulse-remote_$${PKG_VER}_Linux_x86_64.tar.gz" -C /tmp/pulse-pkg .
@@ -220,6 +221,7 @@ package: build
 ## deb: build .deb package
 .PHONY: deb
 deb: build
+	set -e
 	PKG_VER=$$(echo "$(GIT_VERSION)" | sed 's/^v//')
 	rm -rf /tmp/pulse-deb
 	make install DESTDIR=/tmp/pulse-deb/pkg PREFIX=/usr
@@ -235,9 +237,14 @@ deb: build
 ## rpm: build .rpm package (requires rpmbuild)
 .PHONY: rpm
 rpm: build
+	set -e
 	PKG_VER=$$(echo "$(GIT_VERSION)" | sed 's/^v//')
 	rm -rf /tmp/pulse-rpm
-	mkdir -p /tmp/pulse-rpm/rpmbuild/{BUILD,RPMS,SOURCES,SPECS,SRPMS}
+	mkdir -p /tmp/pulse-rpm/rpmbuild/BUILD
+	mkdir -p /tmp/pulse-rpm/rpmbuild/RPMS
+	mkdir -p /tmp/pulse-rpm/rpmbuild/SOURCES 
+	mkdir -p /tmp/pulse-rpm/rpmbuild/SPECS 
+	mkdir -p /tmp/pulse-rpm/rpmbuild/SRPMS
 	make install DESTDIR=/tmp/pulse-rpm/buildroot PREFIX=/usr
 	mv /tmp/pulse-rpm/buildroot "/tmp/pulse-rpm/pulse-remote-$${PKG_VER}"
 	tar czf "/tmp/pulse-rpm/rpmbuild/SOURCES/pulse-remote-$${PKG_VER}.tar.gz" -C /tmp/pulse-rpm "pulse-remote-$${PKG_VER}"
