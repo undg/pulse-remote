@@ -142,9 +142,9 @@ bump/patch:
 bump/minor:
 	./scripts/bump.sh minor
 
-.PHONY: bump/main
-bump/main:
-	./scripts/bump.sh main
+.PHONY: bump/major
+bump/major:
+	./scripts/bump.sh major
 
 # ==================================================================================== #
 # BUILD
